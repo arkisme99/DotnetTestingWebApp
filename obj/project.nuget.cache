@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "uoUywUqs7NI=",
+  "dgSpecHash": "NAPYS7TJtx8=",
   "success": true,
   "projectFilePath": "C:\\laragon\\dotnet\\DotnetTestingWebApp\\DotnetTestingWebApp.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ICONIX\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
-    "C:\\Users\\ICONIX\\.nuget\\packages\\microsoft.aspnetcore.identity.ui\\9.0.8\\microsoft.aspnetcore.identity.ui.9.0.8.nupkg.sha512",
     "C:\\Users\\ICONIX\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "C:\\Users\\ICONIX\\.nuget\\packages\\microsoft.build.framework\\17.8.3\\microsoft.build.framework.17.8.3.nupkg.sha512",
     "C:\\Users\\ICONIX\\.nuget\\packages\\microsoft.build.locator\\1.7.8\\microsoft.build.locator.1.7.8.nupkg.sha512",
