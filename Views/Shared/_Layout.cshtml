@@ -1,60 +1,101 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DotnetTestRazor</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DotnetTestRazor.styles.css" asp-append-version="true" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    @* <meta name="csrf-token" content=""> *@
+    <title>@ViewData["Title"] - Testing App</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
+
+    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css" asp-append-version="true">
+    <link rel="shortcut icon" href="~/dist/img/AdminLTELogo.png" type="image/x-icon">
 </head>
 
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DotnetTestRazor</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Product"
-                                asp-action="Index">Product</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home"
-                                asp-action="Privacy">Privacy</a>
-                        </li>
-
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        @await Html.PartialAsync("_Navigation")
+        <div class="content-wrapper">
             @RenderBody()
-        </main>
+        </div>
+        <footer class="main-footer">
+            <div class="float-right d-none d-sm-inline">
+                Anything you want
+            </div>
+            <strong>Copyright &copy; 2025 <a href="#">Testing App</a>.</strong> All rights reserved.
+        </footer>
+    </div>
+    <div class="modal fade" id="logoutModal">
+        <div class="modal-dialog">
+            <form action="" method="POST" class="row g-3 needs-validation" novalidate>
+                <div class="modal-content bg-danger">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Informasi</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Ingin Keluar Aplikasi ?
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-outline-light" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-outline-light">Ya, Keluar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - DotnetTestRazor - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="~/plugins/jquery-knob/jquery.knob.min.js"></script>
+    <script src="~/helpers/js/notification-messages.js"></script>
+    <script src="~/plugins/toastr/toastr.min.js"></script>
+    <script src="~/dist/js/adminlte.min.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Fungsi untuk mengganti ikon sesuai dengan mode
+            function updateDarkModeIcon() {
+                if ($('body').hasClass('dark-mode')) {
+                    $('nav.main-header').removeClass('navbar-white navbar-light').addClass('navbar-dark');
+                    $('#darkModeToggle i').removeClass('fa-moon').addClass('fa-sun');
+                } else {
+                    $('nav.main-header').removeClass('navbar-dark').addClass('navbar-white navbar-light');
+                    $('#darkModeToggle i').removeClass('fa-sun').addClass('fa-moon');
+                }
+            }
+
+            // Cek status dark mode di localStorage dan terapkan saat halaman dimuat
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                $('body').addClass('dark-mode');
+                $('nav.main-header').removeClass('navbar-white navbar-light').addClass('navbar-dark');
+                updateDarkModeIcon(); // Perbarui ikon sesuai status
+            }
+
+            // Event listener untuk toggle dark mode
+            $('#darkModeToggle').on('click', function () {
+                $('body').toggleClass('dark-mode');
+
+                // Simpan status dark mode ke localStorage dan perbarui ikon
+                if ($('body').hasClass('dark-mode')) {
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+                updateDarkModeIcon(); // Perbarui ikon setelah toggle
+            });
+        });
+    </script>
 </body>
 
 </html>
