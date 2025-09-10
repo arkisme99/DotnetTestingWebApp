@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Data;
@@ -15,6 +16,11 @@ namespace DotnetTestingWebApp.Services
         public async Task<List<Product>> GetProductsAsync()
         {
             return await _context.Products.ToListAsync();
+        }
+
+        public IQueryable<Product> GetAll()
+        {
+            return _context.Products.AsQueryable();
         }
     }
 }
