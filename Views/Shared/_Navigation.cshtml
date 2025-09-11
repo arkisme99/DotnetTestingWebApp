@@ -42,7 +42,8 @@
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <a class="nav-link @(Context.Request.Path.StartsWithSegments("/home") | Context.Request.Path.StartsWithSegments("/") ? "active" : "")"
+                        asp-area="" asp-controller="Home" asp-action="Index">
                         <i class="nav-icon fas fa-home"></i>
                         <p>
                             Beranda
@@ -50,7 +51,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="Product" asp-action="Index">
+                    <a class="nav-link @(Context.Request.Path.StartsWithSegments("/product") ? "active" : "")"
+                        asp-area="" asp-controller="Product" asp-action="Index">
                         <i class="nav-icon fas fa-list-alt"></i>
                         <p>
                             Produk
