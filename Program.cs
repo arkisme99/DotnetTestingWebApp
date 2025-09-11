@@ -14,6 +14,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ProductService>();
 
+// Tambahkan service sebelum Build()
+builder.Services.AddControllersWithViews();
+
+// Routing lowercase
+builder.Services.AddRouting(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true; // optional
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,6 +44,6 @@ app.UseAuthorization();
 // Routing MVC (baru)
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=home}/{action=index}/{id?}");
 
 app.Run();
