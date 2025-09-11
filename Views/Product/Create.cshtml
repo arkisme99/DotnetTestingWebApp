@@ -24,7 +24,10 @@
                 <card-layout title="Tambah Produk Baru">
 							<form action="" method="post" id="formProccess">
                                 @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Nama Produk" }, { "Name", "name" }, { "Attributes", "type=\"text\" placeholder=\"Masukan nama produk\" data-test=\"123\" autofocus=\"true\" autocomplete=\"off\"" } })
+                                
                                 @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Harga Produk" }, { "Name", "price" }, { "Attributes", "type=\"number\" placeholder=\"Masukan harga produk\" autocomplete=\"off\"" } })
+
+                                @await Html.PartialAsync("Components/_SubmitSave")
                             </form>
                 </card-layout>
             </div>
