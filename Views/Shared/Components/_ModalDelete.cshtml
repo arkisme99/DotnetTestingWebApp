@@ -13,8 +13,8 @@
                     @Model
                 </div>
                 <div class="modal-footer">
-                    @* <x-button-cancel />
-				<x-submit-delete /> *@
+                    @await Html.PartialAsync("Components/_ButtonCancel")
+                    @await Html.PartialAsync("Components/_SubmitDelete")
                 </div>
             </form>
         </div>

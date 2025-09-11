@@ -16,14 +16,13 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <button-create LinkPath="Product/Create"></button-create>
                 <card-layout title="Daftar Produk" button-create-link="Product/Create" button-multiple-delete="true">
-                    @await Html.PartialAsync("_TableOuter", new HtmlString(@"
+                    @await Html.PartialAsync("Components/_TableOuter", new HtmlString(@"
                         <thead>
                             <tr>
                                 <th width='5%'><input type='checkbox' id='checkAll'></th>
-                                <th width='5%'>Nama</th>
-                                <th width='15%'>Harga</th>
+                                <th width='15%'>Nama</th>
+                                <th width='5%'>Harga</th>
                                 <th width='10%'>Created At</th>
                                 <th width='10%'>Updated At</th>
                                 <th width='10%'>Actions</th>
@@ -36,8 +35,11 @@
     </div>
 </div>
 
-@await Html.PartialAsync("_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data ?</p>
+@await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data ?</p>
 		<p id='content'></p>"), new ViewDataDictionary(ViewData) { { "ModalId", "modal-delete" }, { "FormId", "formHapus" } })
+
+@await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data yang terpilih ?</p>
+		<input type='hidden' name='datahapus' id='datahapus' value=''>"), new ViewDataDictionary(ViewData) { { "ModalId", "modal-multidelete" }, { "FormId", "formHapusMulti" } })
 
 @section Styles {
 <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
@@ -52,78 +54,80 @@
 <script src="~/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
 <script src="~/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
 <script src="~/dist/jquery.dataTables.colResize.js"></script>
+<script src="~/helpers/js/datatable-render.js"></script>
 <script src="~/helpers/js/format-date.js"></script>
 <script src="~/helpers/js/format-rupiah.js"></script>
 <script type="text/template" id="tpl-button-dropdown">
-    @await Html.PartialAsync("_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
+    @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
 </script>
 <script type="text/template" id="tpl-button-edit">
-    @await Html.PartialAsync("_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
+    @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
 </script>
 <script type="text/template" id="tpl-button-delete">
-    @await Html.PartialAsync("_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, {"DataTitle", "__DATATITLE__"} })
+    @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, {"DataTitle", "__DATATITLE__"} })
+</script>
+<script type="text/template" id="tpl-loading-icon">
+    @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, {"DataTitle", "__DATATITLE__"} })
 </script>
 <script>
     $(function () {
         let columns = [{
                 data: 'id',
                 orderable: false,
-                searchable: false,
-                render: function(data, type, row, meta) {
-                    let check = `<input name='idpilih[]' type="checkbox" id="checkItem" value="${row.id}">`;
-                    return check;
-                }
-            },
-            {
-                data: 'name',
-                render: function(data, type, row, meta) {
-                    return `${row.name}`;
-                }
-            },
-            {
-                data: 'price',
-                render: function(data, type, row, meta) {
-                    return `${formatRupiah(row.price)}`;
-                }
-            },
-            {
-                data: 'createdAt',
-                render: function(data, type, row, meta) {
-                    return `${formatDateTimeYMDHIS(row.createdAt)}`;
-                }
-            },
-            {
-                data: 'updatedAt',
-                render: function(data, type, row, meta) {
-                    return `${formatDateTimeYMDHIS(row.updatedAt)}`;
-                }
-            },
-            {
-                data: 'id',
-                orderable: false,
-                searchable: false,
-                render: function(data, type, row, meta) {
-                    let id = row.id;
-                    let title = row.name;
-
-                    let tpl = $("#tpl-button-edit").html();
-                    tpl = tpl.replace("__LINK__", `/Product/Edit/${id}`);
-                    
-                    let tplDelete = $("#tpl-button-delete").html();
-                    tplDelete = tplDelete.replace("__DATAID__", id);
-                    tplDelete = tplDelete.replace("__DATATITLE__", title);
-
-                    let tplDropdown = $("#tpl-button-dropdown").html()
-                    tplDropdown = tplDropdown.replace("__BTN__", tpl + tplDelete)
-                    
-                    let html = '';
-                    html += tplDropdown;
-                    return html;
-                }
+            searchable: false,
+            render: function(data, type, row, meta) {
+                let check = `<input name='idpilih[]' type="checkbox" id="checkItem" value="${row.id}">`;
+                return check;
             }
-        ];
+        },
+        {
+            data: 'name',
+            render: function(data, type, row, meta) {
+                return `${row.name}`;
+            }
+        },
+        {
+            data: 'price',
+            render: function(data, type, row, meta) {
+                return `${formatRupiah(row.price)}`;
+            }
+        },
+        {
+            data: 'createdAt',
+            render: function(data, type, row, meta) {
+                return `${formatDateTimeYMDHIS(row.createdAt)}`;
+            }
+        },
+        {
+            data: 'updatedAt',
+            render: function(data, type, row, meta) {
+                return `${formatDateTimeYMDHIS(row.updatedAt)}`;
+            }
+        },
+        {
+            data: 'id',
+            orderable: false,
+            searchable: false,
+            render: function(data, type, row, meta) {
+                let id = row.id;
+                let title = row.name;
 
-        let dtURL = "@Url.Action("GetData", "Product")";
+                let tpl = $("#tpl-button-edit").html();
+                tpl = tpl.replace("__LINK__", `/Product/Edit/${id}`);
+                
+                let tplDelete = $("#tpl-button-delete").html();
+                tplDelete = tplDelete.replace("__DATAID__", id);
+                tplDelete = tplDelete.replace("__DATATITLE__", title);
+
+                let tplDropdown = $("#tpl-button-dropdown").html()
+                tplDropdown = tplDropdown.replace("__BTN__", tpl + tplDelete)
+                
+                let html = '';
+                html += tplDropdown;
+                return html;
+            }
+        }
+    ];
         
         let options = {
             isEnabled: true,
@@ -149,48 +153,28 @@
             }
         };
 
-        $("#product").DataTable({
-            autoWidth: false,
-            processing: true,
-            serverSide: true,
-            responsive: true,
-            lengthChange: true,
-            colResize: options,
-            ajax: {
-                url: dtURL,
-                method: 'POST',
-                data: function(d) {}
-            },
-            createdRow: function(row, data, dataIndex, cells) {
-                $(row).attr("data-id", row.id);
-            },
-            order: [5, 'desc'],
-            columns: columns,
-            // buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
-        });
-    
-        $("#checkAll").click(function() {
-            $('input:checkbox').not(this).prop('checked', this.checked);
-        });
-
-        $(document).on('click', '.delete-record', function(e) {
-            var id = $(this).attr("data-id");
-            var title = $(this).attr("data-title");
-            let deleteUrl = ":id";
-            deleteUrl = deleteUrl.replace(':id', id);
-
-            alert(`Delete: ${deleteUrl}`)
-
-            @* $('#formHapus').attr('action', deleteUrl);
-            $('#content').html(`${title}`);
-            $('#modal-delete').modal('show'); *@
-        });
-
-        @* $(".frm-delete").submit(function (e) {
-            // e.preventDefault();
-            $('.delete').html(`<x-loading-icon />`);
-            $('.delete').prop('disabled', true);
-        }); *@
+        let dtURL = "@Url.Action("GetData", "Product")";
+        let deleteDataUrl = `Product/Delete/:id`;
+        
+        dataTableRender(dtURL, columns, options, "POST", deleteDataUrl)
     });
+
+    function hapusmulti() {
+        var id = [];
+
+        $(':checkbox:checked').each(function(i) {
+            id[i] = $(this).val();
+        });
+
+        if (id.length === 0)
+        {} else {
+
+            $('#datahapus').val(id)
+            let deleteUrl = "";
+
+            $('#formHapusMulti').attr('action', deleteUrl);
+            $('#modal-multidelete').modal('show');
+        }
+    }
 </script>
 }
