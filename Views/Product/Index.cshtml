@@ -9,7 +9,11 @@
     "PageHeader", 
     new { 
         PageTitle = "Produk Manajemen", 
-        breadcrumb = new HtmlString("<li class='breadcrumb-item'><a asp-area='' asp-controller='Home' asp-action='Index'>Home</a></li><li class='breadcrumb-item active'>Produk</li>")
+        breadcrumb = new List<(string, string, string)>
+        {
+            ("Home", "Index", "Home"),
+            ("Produk", "", "")
+        }
     }
 )
 <div class="content">

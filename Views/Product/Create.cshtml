@@ -1,0 +1,32 @@
+@using Microsoft.AspNetCore.Html
+@model IEnumerable<DotnetTestingWebApp.Models.Product>
+
+@{
+    ViewData["Title"] = "Produk Page";
+}
+
+@await Component.InvokeAsync(
+    "PageHeader", 
+    new { 
+        PageTitle = "Produk Manajemen | Tambah Data", 
+        breadcrumb = new List<(string, string, string)>
+        {
+            ("Home", "Index", "Home"),
+            ("Produk", "Index", "Product"),
+            ("Tambah Data", "", "")
+        }
+    }
+)
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <card-layout title="Tambah Produk Baru">
+							<form action="" method="post" id="formProccess">
+                                @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Nama Produk" }, { "Name", "name" }, { "Attributes", "placeholder=\"Masukan nama produk\" data-test=\"123\" autofocus=\"true\" autocomplete=\"off\"" } })
+                            </form>
+                </card-layout>
+            </div>
+        </div>
+    </div>
+</div>

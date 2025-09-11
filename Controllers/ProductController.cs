@@ -20,6 +20,11 @@ namespace DotnetTestingWebApp.Controllers
             return View(products);
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {

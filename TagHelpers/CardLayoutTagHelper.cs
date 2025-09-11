@@ -32,7 +32,8 @@ namespace DotnetTestingWebApp.TagHelpers
 
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
             {
-                { "LinkPath", "/Product/Create" }
+                { "LinkController", "Product" },
+                { "LinkAction", "Create" }
             };
 
             var buttonCreate = await _htmlHelper.PartialAsync(

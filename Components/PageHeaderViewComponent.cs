@@ -9,7 +9,7 @@ namespace DotnetTestingWebApp.Components
 {
     public class PageHeaderViewComponent : ViewComponent
     {
-        public IViewComponentResult Invoke(string PageTitle, IHtmlContent? breadcrumb = null)
+        public IViewComponentResult Invoke(string PageTitle, List<(string label, string action, string controller)> breadcrumb)
         {
             ViewData["PageTitle"] = PageTitle;
             ViewData["Breadcrumb"] = breadcrumb;
