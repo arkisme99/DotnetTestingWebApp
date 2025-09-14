@@ -9,15 +9,19 @@ namespace DotnetTestingWebApp.Models
 {
     public class Product
     {
+        [Key]
         [Column("id")]
         public int Id { get; set; }
 
         [Column("name", TypeName = "varchar(255)")]
+        [Required(ErrorMessage = "Nama wajib diisi")]
         [MaxLength(255)]
         public string Name { get; set; } = string.Empty;
 
         [Column("price", TypeName = "decimal(15,6)")]
-        public decimal Price { get; set; }
+        [Required(ErrorMessage = "Harga wajib diisi")]
+        [Range(typeof(decimal), "1", "9999999999999999", ErrorMessage = "Harga minimal 1")]
+        public decimal? Price { get; set; }
 
         [Column("created_at", TypeName = "timestamp")]
         public DateTime? CreatedAt { get; set; }

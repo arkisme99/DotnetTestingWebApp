@@ -96,6 +96,15 @@
             });
         });
     </script>
+    <script>
+        const type = '@TempData["TypeMessage"]';
+        const message = '@TempData["ValueMessage"]';
+
+        if (message) {
+            notificationMessages(type, message);
+        }
+    </script>
+
 </body>
 
 </html>

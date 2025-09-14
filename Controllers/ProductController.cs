@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetTestingWebApp.Controllers
 {
-    public class ProductController(ProductService service) : Controller
+    public class ProductController(IProductService service) : Controller
     {
-        private readonly ProductService _service = service;
+        private readonly IProductService _service = service;
 
         public async Task<IActionResult> Index()
         {
@@ -23,6 +24,21 @@ namespace DotnetTestingWebApp.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+
+        //POST : Products/Store
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Product product)
+        {
+            if (ModelState.IsValid)
+            {
+                await _service.StoreAsync(product);
+                TempData["TypeMessage"] = "success";
+                TempData["ValueMessage"] = "Product berhasil dibuat!";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(product);
         }
 
         [HttpPost]

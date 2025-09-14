@@ -12,7 +12,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // Tambahkan service sebelum Build()
 builder.Services.AddControllersWithViews();

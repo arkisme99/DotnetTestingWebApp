@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
 {
-    public class ProductService(ApplicationDbContext context)
+    public class ProductService(ApplicationDbContext context) : IProductService
     {
         private readonly ApplicationDbContext _context = context;
 
@@ -21,6 +21,13 @@ namespace DotnetTestingWebApp.Services
         public IQueryable<Product> GetAll()
         {
             return _context.Products.AsQueryable();
+        }
+
+        public async Task<Product> StoreAsync(Product product)
+        {
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return product;
         }
     }
 }

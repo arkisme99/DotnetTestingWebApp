@@ -3,7 +3,8 @@ async function dataTableRender(
   columns,
   options,
   methodUrl,
-  deleteDataUrl
+  deleteDataUrl,
+  numOrder
 ) {
   // Tunggu sampai DataTable selesai inisialisasi
   const table = await new Promise((resolve) => {
@@ -24,7 +25,7 @@ async function dataTableRender(
       createdRow: function (row, data, dataIndex, cells) {
         $(row).attr("data-id", row.id);
       },
-      order: [5, "desc"],
+      order: [numOrder, "desc"],
       columns: columns,
     });
 

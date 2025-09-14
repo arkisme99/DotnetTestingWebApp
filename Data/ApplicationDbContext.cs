@@ -7,32 +7,47 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
-
         public DbSet<Product> Products { get; set; }
 
         public override int SaveChanges()
         {
+            ApplyAuditInfo();
+            return base.SaveChanges();
+        }
+
+        public override Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default)
+        {
+            ApplyAuditInfo();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void ApplyAuditInfo()
+        {
             var entries = ChangeTracker
                 .Entries()
                 .Where(e => e.Entity is Product &&
-                        (e.State == EntityState.Added || e.State == EntityState.Modified));
+                            (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             foreach (var entityEntry in entries)
             {
+                var entity = (Product)entityEntry.Entity;
+
                 if (entityEntry.State == EntityState.Added)
                 {
-                    ((Product)entityEntry.Entity).CreatedAt = DateTime.Now;
+                    entity.CreatedAt = DateTime.Now;
+                }
+                else
+                {
+                    // Pastikan CreatedAt tidak ikut diubah saat update
+                    entityEntry.Property(nameof(Product.CreatedAt)).IsModified = false;
                 }
 
-                ((Product)entityEntry.Entity).UpdatedAt = DateTime.Now;
+                entity.UpdatedAt = DateTime.Now;
             }
-
-            return base.SaveChanges();
         }
     }
 }
