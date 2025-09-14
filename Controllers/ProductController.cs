@@ -41,6 +41,13 @@ namespace DotnetTestingWebApp.Controllers
             return View(product);
         }
 
+        public async Task<IActionResult> Edit(int id)
+        {
+            var product = await _service.GetByIdAsync(id);
+            if (product == null) return NotFound();
+            return View(product);
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {
