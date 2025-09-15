@@ -66,6 +66,9 @@ builder.Services.AddRouting(options =>
     options.LowercaseQueryStrings = true; // optional
 });
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace DotnetTestingWebApp.Controllers
 {
-    public class AuthController(IAuthService service) : Controller
+    public class AuthController(IAuthService service, ILogger<AuthController> logger) : Controller
     {
-        // private readonly ILogger<AuthController> _logger = logger;
+        private readonly ILogger<AuthController> _logger = logger;
         private readonly IAuthService _service = service;
 
         public IActionResult Login(string? message)
@@ -22,6 +22,8 @@ namespace DotnetTestingWebApp.Controllers
                 TempData["ValueMessage"] = message;
             }
 
+            _logger.LogInformation("Ini pesan info di AuthController pada {time}", DateTime.UtcNow);
+            _logger.LogWarning("Ini pesan info di AuthController pada {time}", DateTime.UtcNow);
             return View();
         }
 

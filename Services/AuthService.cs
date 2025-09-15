@@ -8,20 +8,25 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DotnetTestingWebApp.Services
 {
-    public class AuthService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signManager, RoleManager<ApplicationRole> roleManager) : IAuthService
+    public class AuthService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signManager, RoleManager<ApplicationRole> roleManager, ILogger<AuthService> logger) : IAuthService
     {
         private readonly ApplicationDbContext _context = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signManager;
         private readonly RoleManager<ApplicationRole> _roleManager = roleManager;
+        private readonly ILogger<AuthService> _logger = logger;
 
 
         public async Task<bool> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
+
+            _logger.LogWarning("Login proses ({email}): {user}", email, user);
             if (user == null) return false;
 
             var result = await _signInManager.PasswordSignInAsync(user, password, true, lockoutOnFailure: false);
+
+            _logger.LogWarning("Login result: {result}", result);
             return result.Succeeded;
         }
 
