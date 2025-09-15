@@ -48,7 +48,7 @@ namespace DotnetTestingWebApp.Controllers
             return View(product);
         }
 
-        //PUT: Products/Update
+        //POST: Products/Update
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Product product)
@@ -63,6 +63,15 @@ namespace DotnetTestingWebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
+        }
+
+        // POST: Products/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _service.DeleteAsync(id);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]

@@ -110,7 +110,7 @@
                 let title = row.name;
 
                 let tpl = $("#tpl-button-edit").html();
-                tpl = tpl.replace("__LINK__", `/Product/Edit/${id}`);
+                tpl = tpl.replace("__LINK__", `/product/edit/${id}`);
                 
                 let tplDelete = $("#tpl-button-delete").html();
                 tplDelete = tplDelete.replace("__DATAID__", id);
@@ -151,7 +151,7 @@
         };
 
         let dtURL = "@Url.Action("GetData", "Product")";
-        let deleteDataUrl = `Product/Delete/:id`;
+        let deleteDataUrl = `product/delete/:id`;
         
         const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 2)
     });
