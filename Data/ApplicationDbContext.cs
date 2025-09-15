@@ -10,6 +10,10 @@ namespace DotnetTestingWebApp.Data
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
         public DbSet<Product> Products { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<ApplicationRolePermission> RolePermissions { get; set; }
+
+        public DbSet<ApplicationUser> Users { get; set; }
 
         public override int SaveChanges()
         {
@@ -48,6 +52,24 @@ namespace DotnetTestingWebApp.Data
 
                 entity.UpdatedAt = DateTime.Now;
             }
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+
+            builder.Entity<ApplicationRolePermission>()
+                .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            builder.Entity<ApplicationRolePermission>()
+                .HasOne(rp => rp.Role)
+                .WithMany() // atau .WithMany(r => r.RolePermissions) kalau kamu tambahkan koleksi di ApplicationRole
+                .HasForeignKey(rp => rp.RoleId);
+
+            builder.Entity<ApplicationRolePermission>()
+                .HasOne(rp => rp.Permission)
+                .WithMany(p => p.RolePermissions)
+                .HasForeignKey(rp => rp.PermissionId);
         }
     }
 }
