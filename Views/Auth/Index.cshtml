@@ -1,0 +1,43 @@
+@using Microsoft.AspNetCore.Html
+
+@{
+    ViewData["Title"] = "Login Page";
+}
+
+<p class="login-box-msg">Sign in to start your session</p>
+
+<form asp-action="Index" method="post" id="formProccess">
+    
+  @await Html.PartialAsync("Components/_FormInputGroup", new ViewDataDictionary(ViewData) { { "Name", "Email" }, { "Attributes", "type=\"email\" placeholder=\"Masukan Email Valid\" autofocus=\"true\" autocomplete=\"off\" required" }, { "Icon", "fas fa-envelope" } })
+  
+  @await Html.PartialAsync("Components/_FormInputGroup", new ViewDataDictionary(ViewData) { { "Name", "password" }, { "Attributes", "type=\"password\" placeholder=\"Masukan Password Anda\" autocomplete=\"off\" required" }, { "Icon", "show-password-toggle fas fa-eye" }, { "dataTargetIcon", "#password" } })
+
+  <div class="row">
+    <div class="col-6">
+      @await Html.PartialAsync("Components/_FormCheckBox", new ViewDataDictionary(ViewData) { { "Name", "remember" }, { "Id", "remember_me" }, { "Label", "Remember Me" } })
+    </div>
+    <!-- /.col -->
+    <div class="col-6">
+      @await Html.PartialAsync("Components/_SubmitPrimary", new ViewDataDictionary(ViewData) { { "Id", "btnSubmit" }, { "Label", "Login" } })
+    </div>
+    <!-- /.col -->
+  </div>
+</form>
+<p class="mb-1">
+    @* <a href="">Forgot Your Password</a> *@
+</p>
+<p class="mb-0">
+  @* <a href="" class="text-center">Register</a> *@
+</p>
+
+@section Scripts {
+    <script src="~/helpers/js/form-handler.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/helpers/js/showpassword.js"></script>
+    <script>
+    handleFormSubmission({
+        formSelector: '#formProccess',
+        buttonSelector: '#btnSubmit'
+    });
+    </script>
+}

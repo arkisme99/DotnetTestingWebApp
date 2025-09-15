@@ -1,0 +1,19 @@
+<div class="input-group mb-3">
+    <input class="form-control" name='@ViewData["Name"]' id='@ViewData["Name"]' @Html.Raw(ViewData["Attributes"])>
+    <div class="input-group-append">
+        @{
+            // Ambil nilai dari ViewData atau ViewBag
+            var iconClass = ViewData["Icon"]?.ToString() ?? "";
+
+            // Ambil dari attribute (kalau ada model / ViewData lain)
+            var dataTargetIcon = ViewData["DataTargetIcon"]?.ToString() ?? "";
+        }
+        <div class="input-group-text">
+            <span class="@iconClass" @(string.IsNullOrEmpty(dataTargetIcon) ? "" :
+                                                     $"data-target={dataTargetIcon}")></span>
+        </div>
+    </div>
+    <span class="text-danger invalid-feedback">
+        @Html.ValidationMessage(ViewData["Name"]!.ToString())
+    </span>
+</div>

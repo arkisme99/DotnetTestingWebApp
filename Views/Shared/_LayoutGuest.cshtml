@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    @* <meta name="csrf-token" content=""> *@
+    <title>@ViewData["Title"] - Testing App</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
+
+    @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css" asp-append-version="true">
+    <link rel="shortcut icon" href="~/dist/img/AdminLTELogo.png" type="image/x-icon">
+
+    <style>
+        body {
+            background: url('/dist/img/default-bg.png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .login-logo img {
+            max-width: 150px;
+        }
+
+        @@media (max-width: 576px) {
+            .login-box {
+                /* margin: 10% auto; */
+                width: 100%;
+                max-width: 350px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="login-box">
+        <div class="login-logo text-center">
+            <h1>Login Page</h1>
+        </div>
+        @RenderBody()
+    </div>
+
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <script src="~/helpers/js/notification-messages.js"></script>
+    <script src="~/plugins/toastr/toastr.min.js"></script>
+    <script src="~/dist/js/adminlte.min.js" asp-append-version="true"></script>
+
+    <script>
+        const type = '@TempData["TypeMessage"]';
+        const message = '@TempData["ValueMessage"]';
+
+        if (message) {
+            notificationMessages(type, message);
+        }
+    </script>
+
+</body>
+
+</html>
