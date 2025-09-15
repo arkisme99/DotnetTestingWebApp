@@ -6,7 +6,7 @@
 
 <p class="login-box-msg">Sign in to start your session</p>
 
-<form asp-action="Index" method="post" id="formProccess">
+<form asp-action="Login" method="post" id="formProccess">
     
   @await Html.PartialAsync("Components/_FormInputGroup", new ViewDataDictionary(ViewData) { { "Name", "Email" }, { "Attributes", "type=\"email\" placeholder=\"Masukan Email Valid\" autofocus=\"true\" autocomplete=\"off\" required" }, { "Icon", "fas fa-envelope" } })
   

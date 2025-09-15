@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using DotnetTestingWebApp.Helpers;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotnetTestingWebApp.Controllers
 {
+    [Authorize]
     public class ProductController(IProductService service) : Controller
     {
         private readonly IProductService _service = service;

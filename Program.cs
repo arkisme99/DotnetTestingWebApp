@@ -1,5 +1,7 @@
 using DotnetTestingWebApp.Data;
+using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,9 +12,49 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
 ));
 
-// Add services to the container.
+// Identity
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+    {
+        // Optional: konfigurasi password, lockout, dsb
+        options.Password.RequireDigit = true;
+        options.Password.RequiredLength = 6;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+//
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/auth/login";
+    options.LogoutPath = "/auth/logout";
+    options.AccessDeniedPath = "/auth/AccessDenied";
+
+    // Tambahkan event handler
+    options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = context =>
+        {
+            // RedirectUri sudah mengandung ?ReturnUrl=...
+            var redirectUri = context.RedirectUri;
+
+            // tambahin pesan tanpa menghapus ReturnUrl
+            var separator = redirectUri.Contains('?') ? "&" : "?";
+            redirectUri += $"{separator}message=Harus+login+dulu+bro!";
+
+            context.Response.Redirect(redirectUri);
+            return Task.CompletedTask;
+        }
+    };
+});
+
+//MVC
 builder.Services.AddControllersWithViews();
+
+// Add services to the container.
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Tambahkan service sebelum Build()
 builder.Services.AddControllersWithViews();
@@ -38,12 +80,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Routing MVC (baru)
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=auth}/{action=index}/{id?}");
+    pattern: "{controller=auth}/{action=login}/{id?}");
 
 app.Run();
