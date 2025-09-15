@@ -52,5 +52,37 @@ namespace DotnetTestingWebApp.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<int> DeleteProductsAsync(string ids)
+        {
+            if (string.IsNullOrWhiteSpace(ids))
+                return 0;
+
+            // pecah string id "1,2,3"
+            var idList = ids.Split(',')
+                            .Select(id => int.TryParse(id, out var parsed) ? parsed : (int?)null)
+                            .Where(id => id.HasValue)
+                            .Select(id => id!.Value)
+                            .ToList();
+
+            int deletedCount = 0;
+
+            foreach (var id in idList)
+            {
+                var product = await _context.Products
+                                            .FirstOrDefaultAsync(p => p.Id == id);
+
+                if (product != null)
+                {
+                    _context.Products.Remove(product);
+                    deletedCount++;
+                }
+            }
+
+            if (deletedCount > 0)
+                await _context.SaveChangesAsync();
+
+            return deletedCount;
+        }
     }
 }

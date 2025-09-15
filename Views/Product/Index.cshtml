@@ -157,7 +157,14 @@
     });
 
     $("#btn-delete-multi").on("click", function () {
-        hapusmulti("url-multi-delete");
+        let multiDeleteDataUrl = `product/multi-delete`;
+        hapusmulti(multiDeleteDataUrl);
+    });
+
+    $("#formHapusMulti").submit(function (e) {
+        let tpl = $("#tpl-loading-icon").html();
+        $(".delete").html(tpl);
+        $(".delete").prop("disabled", true);
     });
 </script>
 }

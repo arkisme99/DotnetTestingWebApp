@@ -14,5 +14,6 @@ namespace DotnetTestingWebApp.Services
         Task<Product> GetByIdAsync(int id);
         Task<Product> UpdateAsync(Product product);
         Task DeleteAsync(int id);
+        Task<int> DeleteProductsAsync(string ids);
     }
 }

@@ -71,6 +71,30 @@ namespace DotnetTestingWebApp.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _service.DeleteAsync(id);
+            TempData["TypeMessage"] = "success";
+            TempData["ValueMessage"] = "Product berhasil dihapus!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ActionName("multi-delete")]
+        public async Task<IActionResult> MultiDelete(string datahapus)
+        {
+            if (string.IsNullOrWhiteSpace(datahapus))
+                return BadRequest("Tidak ada data untuk dihapus.");
+
+            var deletedCount = await _service.DeleteProductsAsync(datahapus);
+
+            if (deletedCount > 0)
+            {
+                TempData["TypeMessage"] = "success";
+                TempData["ValueMessage"] = $"{deletedCount} produk berhasil dihapus.";
+            }
+            else
+            {
+                TempData["TypeMessage"] = "warning";
+                TempData["ValueMessage"] = "Tidak ada produk yang dihapus.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
