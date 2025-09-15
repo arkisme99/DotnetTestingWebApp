@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetTestingWebApp.Helpers;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -101,37 +102,31 @@ namespace DotnetTestingWebApp.Controllers
         [HttpPost]
         public IActionResult GetData()
         {
-            var draw = Request.Form["draw"].FirstOrDefault();
-            var start = Convert.ToInt32(Request.Form["start"].FirstOrDefault() ?? "0");
-            var length = Convert.ToInt32(Request.Form["length"].FirstOrDefault() ?? "10");
-            var searchValue = Request.Form["search[value]"].FirstOrDefault();
-            var sortColumn = Request.Form["order[0][column]"].FirstOrDefault();
-            var sortDir = Request.Form["order[0][dir]"].FirstOrDefault();
+            var req = DataTableHelper.GetDataTableRequest(Request);
 
-            var query = _service.GetAll();
+            var query = _service.GetAll(); // IQueryable<Product>
 
             // Filtering
-            if (!string.IsNullOrWhiteSpace(searchValue))
+            if (!string.IsNullOrWhiteSpace(req.SearchValue))
             {
-                query = query.Where(p => p.Name.Contains(searchValue));
+                query = query.Where(p => p.Name.Contains(req.SearchValue));
             }
 
-            // Sorting (contoh kolom name & price saja)
-            if (sortColumn == "1")
-                query = sortDir == "asc" ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name);
-            else if (sortColumn == "2")
-                query = sortDir == "asc" ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+            // Sorting (kolom index 1 = Name, 2 = Price)
+            if (req.SortColumn == "1")
+                query = req.SortDir == "asc" ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name);
+            else if (req.SortColumn == "2")
+                query = req.SortDir == "asc" ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
 
             var recordsTotal = query.Count();
+            var data = query.Skip(req.Start).Take(req.Length).ToList();
 
-            var data = query.Skip(start).Take(length).ToList();
-
-            return Json(new
+            return Json(new DataTableResponse<Product>
             {
-                draw,
-                recordsFiltered = recordsTotal,
-                recordsTotal,
-                data
+                Draw = req.Draw!,
+                RecordsFiltered = recordsTotal,
+                RecordsTotal = recordsTotal,
+                Data = data
             });
         }
     }
