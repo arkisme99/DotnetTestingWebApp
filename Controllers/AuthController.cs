@@ -33,7 +33,7 @@ namespace DotnetTestingWebApp.Controllers
 
             // ViewBag.Error = "Invalid login attempt.";
             TempData["TypeMessage"] = "error";
-            TempData["ValueMessage"] = "Invalid login attempt.";
+            TempData["ValueMessage"] = "Email or Password Is Wrong";
             return View();
         }
 
