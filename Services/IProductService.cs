@@ -12,5 +12,6 @@ namespace DotnetTestingWebApp.Services
         IQueryable<Product> GetAll();
         Task<Product> StoreAsync(Product product);
         Task<Product> GetByIdAsync(int id);
+        Task<Product> UpdateAsync(Product product);
     }
 }

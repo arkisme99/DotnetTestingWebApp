@@ -35,5 +35,12 @@ namespace DotnetTestingWebApp.Services
             var data = await _context.Products.FindAsync(id);
             return data!;
         }
+
+        public async Task<Product> UpdateAsync(Product product)
+        {
+            _context.Products.Update(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
     }
 }

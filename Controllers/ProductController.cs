@@ -48,6 +48,23 @@ namespace DotnetTestingWebApp.Controllers
             return View(product);
         }
 
+        //PUT: Products/Update
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Product product)
+        {
+            if (id != product.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                await _service.UpdateAsync(product);
+                TempData["TypeMessage"] = "success";
+                TempData["ValueMessage"] = "Product berhasil diupdate!";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(product);
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {
