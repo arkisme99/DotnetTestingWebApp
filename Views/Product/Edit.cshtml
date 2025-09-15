@@ -23,8 +23,8 @@
             <div class="col-12">
                 <card-layout title="Edit Produk">
 							<form asp-action="Edit" method="post" id="formProccess">
-                                @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Nama Produk" }, { "Name", "Name" }, { "Attributes", $"type=\"text\" placeholder=\"Masukan nama produk\" data-test=\"123\" autofocus=\"true\" autocomplete=\"off\" value=\"{Model.Name}\"" } })
-                                @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Harga Produk" }, { "Name", "Price" }, { "Attributes", $"type=\"text\" placeholder=\"Masukan harga produk\" autocomplete=\"off\" value=\"{Model.Price}\"" } })
+                                @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Nama Produk" }, { "Name", "Name" }, { "Attributes", $"type=\"text\" placeholder=\"Masukan nama produk\" data-test=\"123\" autofocus=\"true\" autocomplete=\"off\" value=\"{Model.Name}\" required" } })
+                                @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Harga Produk" }, { "Name", "Price" }, { "Attributes", $"type=\"text\" placeholder=\"Masukan harga produk\" autocomplete=\"off\" value=\"{Model.Price}\" required" } })
 
                                 @await Html.PartialAsync("Components/_SubmitSave")
                             </form>
@@ -34,5 +34,12 @@
     </div>
 </div>
 @section Scripts {
+    <script src="~/helpers/js/form-handler.js"></script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+    handleFormSubmission({
+        formSelector: '#formProccess',
+        buttonSelector: '#btnSave'
+    });
+    </script>
 }
