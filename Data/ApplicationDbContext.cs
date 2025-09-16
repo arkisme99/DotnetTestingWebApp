@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
     {
         public DbSet<Product> Products { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<ApplicationRolePermission> RolePermissions { get; set; }
-
-        public DbSet<ApplicationUser> Users { get; set; }
 
         public override int SaveChanges()
         {

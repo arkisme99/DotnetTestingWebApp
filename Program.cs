@@ -1,5 +1,6 @@
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
+using DotnetTestingWebApp.Seeders;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -71,6 +72,13 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
+// 🔹 panggil seeder di sini
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await IdentitySeeder.SeedAsync(services);
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -84,6 +92,24 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthentication();
+
+// 🔹 Custom Middleware: redirect kalau sudah login akses /Login
+app.Use(async (context, next) =>
+{
+    if (context.User?.Identity?.IsAuthenticated == true)
+    {
+        if (context.Request.Path.StartsWithSegments("/auth/login") ||
+            context.Request.Path.StartsWithSegments("/login") ||
+            context.Request.Path.StartsWithSegments("/"))
+        {
+            context.Response.Redirect("/home/index");
+            return;
+        }
+    }
+
+    await next();
+});
+
 app.UseAuthorization();
 
 // Routing MVC (baru)
