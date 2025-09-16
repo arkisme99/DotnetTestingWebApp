@@ -1,2 +1,9 @@
-<a class="dropdown-item delete-record" href="javascript:;" data-id="@ViewData["DataId"]"
-    data-title="@ViewData["DataTitle"]"><i class="fas fa-trash"></i> Hapus</a>
+@{
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var permissionName = $"Delete{controllerName}";
+}
+@if (User.HasClaim("Permission", permissionName))
+{
+    <a class="dropdown-item delete-record" href="javascript:;" data-id="@ViewData["DataId"]"
+        data-title="@ViewData["DataTitle"]"><i class="fas fa-trash"></i> Hapus</a>
+}

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Seeders
 {
@@ -96,6 +97,51 @@ namespace DotnetTestingWebApp.Seeders
                 if (result.Succeeded && adminRole != null)
                 {
                     await userManager.AddToRoleAsync(user, adminRole.Name!);
+                }
+            }
+
+            // 5. Assign Permissions to User role
+            var userRole = await roleManager.FindByNameAsync("User");
+            if (userRole != null)
+            {
+                var viewUserPermission = await dbContext.Permissions.FirstOrDefaultAsync(p => p.Name == "ViewProduct");
+
+                if (viewUserPermission != null)
+                {
+                    bool alreadyAssigned = dbContext.RolePermissions
+                        .Any(rp => rp.RoleId == userRole.Id && rp.PermissionId == viewUserPermission.Id);
+
+                    if (!alreadyAssigned)
+                    {
+                        dbContext.RolePermissions.Add(new ApplicationRolePermission
+                        {
+                            RoleId = userRole.Id,
+                            PermissionId = viewUserPermission.Id
+                        });
+
+                        await dbContext.SaveChangesAsync();
+                    }
+                }
+            }
+
+            // 6. Seed Default Admin User
+            string userEmail = "user@example.com";
+            string userPassword = "User123!"; // hashed otomatis
+
+            if (await userManager.FindByEmailAsync(userEmail) == null)
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = userEmail,
+                    Email = userEmail,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(user, userPassword);
+
+                if (result.Succeeded && userRole != null)
+                {
+                    await userManager.AddToRoleAsync(user, userRole.Name!);
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Helpers;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
@@ -16,6 +17,7 @@ namespace DotnetTestingWebApp.Controllers
     {
         private readonly IProductService _service = service;
 
+        [HasPermission("ViewProduct")]
         public async Task<IActionResult> Index()
         {
             var products = await _service.GetProductsAsync();
@@ -24,12 +26,14 @@ namespace DotnetTestingWebApp.Controllers
             return View(products);
         }
 
+        [HasPermission("CreateProduct")]
         public IActionResult Create()
         {
             return View();
         }
 
         //POST : Products/Store
+        [HasPermission("CreateProduct")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Product product)
@@ -44,6 +48,7 @@ namespace DotnetTestingWebApp.Controllers
             return View(product);
         }
 
+        [HasPermission("EditProduct")]
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _service.GetByIdAsync(id);
@@ -52,6 +57,7 @@ namespace DotnetTestingWebApp.Controllers
         }
 
         //POST: Products/Update
+        [HasPermission("EditProduct")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Product product)
@@ -69,6 +75,7 @@ namespace DotnetTestingWebApp.Controllers
         }
 
         // POST: Products/Delete/5
+        [HasPermission("DeleteProduct")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -79,6 +86,7 @@ namespace DotnetTestingWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HasPermission("MultiDeleteProduct")]
         [HttpPost, ActionName("multi-delete")]
         public async Task<IActionResult> MultiDelete(string datahapus)
         {

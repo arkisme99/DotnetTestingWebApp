@@ -11,9 +11,14 @@ namespace DotnetTestingWebApp.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        [Permission("home.view")]
-        public IActionResult Index()
+        public IActionResult Index(string? message)
         {
+            if (!string.IsNullOrEmpty(message))
+            {
+                TempData["TypeMessage"] = "error";
+                TempData["ValueMessage"] = message;
+            }
+
             return View();
         }
 

@@ -1,7 +1,9 @@
+using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Seeders;
 using DotnetTestingWebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +32,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/auth/login";
     options.LogoutPath = "/auth/logout";
-    options.AccessDeniedPath = "/auth/AccessDenied";
+    options.AccessDeniedPath = "/home/index";
 
     // Tambahkan event handler
     options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents
@@ -43,6 +45,16 @@ builder.Services.ConfigureApplicationCookie(options =>
             // tambahin pesan tanpa menghapus ReturnUrl
             var separator = redirectUri.Contains('?') ? "&" : "?";
             redirectUri += $"{separator}message=Harus+login+dulu+bro!";
+
+            context.Response.Redirect(redirectUri);
+            return Task.CompletedTask;
+        },
+        OnRedirectToAccessDenied = context =>
+        {
+            var redirectUri = context.RedirectUri;
+
+            var separator = redirectUri.Contains('?') ? "&" : "?";
+            redirectUri += $"{separator}message=Anda+Gak+punya+izin+bro!";
 
             context.Response.Redirect(redirectUri);
             return Task.CompletedTask;
@@ -69,6 +81,13 @@ builder.Services.AddRouting(options =>
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("Permission", policy =>
+        policy.Requirements.Add(new PermissionRequirement("DYNAMIC")));
+
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 
 var app = builder.Build();
 
