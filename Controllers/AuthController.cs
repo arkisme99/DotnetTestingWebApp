@@ -43,6 +43,8 @@ namespace DotnetTestingWebApp.Controllers
         public async Task<IActionResult> Logout()
         {
             await _service.LogoutAsync();
+            TempData["TypeMessage"] = "warning";
+            TempData["ValueMessage"] = "Logout Sukses, Terimakasih!";
             return RedirectToAction("Login");
         }
 
