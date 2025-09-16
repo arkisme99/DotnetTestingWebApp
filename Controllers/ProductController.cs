@@ -9,6 +9,7 @@ using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Controllers
 {
@@ -116,24 +117,60 @@ namespace DotnetTestingWebApp.Controllers
 
             var query = _service.GetAll(); // IQueryable<Product>
 
-            // Filtering
-            if (!string.IsNullOrWhiteSpace(req.SearchValue))
+            // 🔍 Global Search
+            if (!string.IsNullOrWhiteSpace(req.Search.Value))
             {
-                query = query.Where(p => p.Name.Contains(req.SearchValue));
+                var search = req.Search.Value.ToLower();
+
+                query = query.Where(p =>
+                    EF.Functions.Like(p.Name, $"%{search}%") ||
+                    EF.Functions.Like(p.Price.ToString(), $"%{search}%") ||
+                    EF.Functions.Like(p.CreatedAt.ToString(), $"%{search}%") ||
+                    EF.Functions.Like(p.UpdatedAt.ToString(), $"%{search}%"));
             }
 
-            // Sorting (kolom index 1 = Name, 2 = Price)
-            if (req.SortColumn == "1")
-                query = req.SortDir == "asc" ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name);
-            else if (req.SortColumn == "2")
-                query = req.SortDir == "asc" ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price);
+            // 🔍 Per-column Search
+            foreach (var col in req.Columns.Where(c => c.Searchable && !string.IsNullOrWhiteSpace(c.Search.Value)))
+            {
+                var search = col.Search.Value.ToLower();
+
+                if (col.Data == "name")
+                    query = query.Where(p => EF.Functions.Like(p.Name, $"%{search}%"));
+                else if (col.Data == "price")
+                    query = query.Where(p => EF.Functions.Like(p.Price.ToString(), $"%{search}%"));
+                else if (col.Data == "createdAt")
+                    query = query.Where(p => EF.Functions.Like(p.CreatedAt.ToString(), $"%{search}%"));
+                else if (col.Data == "updatedAt")
+                    query = query.Where(p => EF.Functions.Like(p.UpdatedAt.ToString(), $"%{search}%"));
+            }
+
+            // 🔽 Sorting (pakai order yang dikirim DataTables)
+            if (req.Order.Count > 0)
+            {
+                var firstOrder = req.Order.First();
+                var sortCol = req.Columns[firstOrder.Column].Data;
+                var dir = firstOrder.Dir;
+
+                query = (sortCol, dir) switch
+                {
+                    ("name", "asc") => query.OrderBy(p => p.Name),
+                    ("name", "desc") => query.OrderByDescending(p => p.Name),
+                    ("price", "asc") => query.OrderBy(p => p.Price),
+                    ("price", "desc") => query.OrderByDescending(p => p.Price),
+                    ("createdAt", "asc") => query.OrderBy(p => p.CreatedAt),
+                    ("createdAt", "desc") => query.OrderByDescending(p => p.CreatedAt),
+                    ("updatedAt", "asc") => query.OrderBy(p => p.UpdatedAt),
+                    ("updatedAt", "desc") => query.OrderByDescending(p => p.UpdatedAt),
+                    _ => query
+                };
+            }
 
             var recordsTotal = query.Count();
             var data = query.Skip(req.Start).Take(req.Length).ToList();
 
             return Json(new DataTableResponse<Product>
             {
-                Draw = req.Draw!,
+                Draw = req.Draw,
                 RecordsFiltered = recordsTotal,
                 RecordsTotal = recordsTotal,
                 Data = data

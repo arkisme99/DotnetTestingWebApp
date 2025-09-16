@@ -32,7 +32,17 @@
                                 <th width='10%'>Actions</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>"), new ViewDataDictionary(ViewData) { { "TableId", "product" } })
+                        <tbody></tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th><input type='text' class='form-control' placeholder='Search Name' /></th>
+                                <th><input type='text' class='form-control' placeholder='Search Price' /></th>
+                                <th><input type='text' class='form-control' placeholder='Search Created At' /></th>
+                                <th><input type='text' class='form-control' placeholder='Search Updated At' /></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>"), new ViewDataDictionary(ViewData) { { "TableId", "product" } })
                 </card-layout>
             </div>
         </div>
@@ -153,7 +163,7 @@
         let dtURL = "@Url.Action("GetData", "Product")";
         let deleteDataUrl = `product/delete/:id`;
         
-        const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 2)
+        const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 3, 'product')
     });
 
     $("#btn-delete-multi").on("click", function () {

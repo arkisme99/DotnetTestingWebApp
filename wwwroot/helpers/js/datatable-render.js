@@ -4,16 +4,18 @@ async function dataTableRender(
   options,
   methodUrl,
   deleteDataUrl,
-  numOrder
+  numOrder,
+  tableId
 ) {
   // Tunggu sampai DataTable selesai inisialisasi
   const table = await new Promise((resolve) => {
-    const dt = $("#product").DataTable({
+    const dt = $(`#${tableId}`).DataTable({
       autoWidth: false,
       processing: true,
       serverSide: true,
       responsive: true,
       lengthChange: true,
+      searchDelay: 700,
       colResize: options,
       ajax: {
         url: dtURL,
@@ -32,6 +34,17 @@ async function dataTableRender(
     // DataTables punya event init
     dt.on("init", function () {
       resolve(dt);
+    });
+  });
+
+  // Apply search per column
+  table.columns().every(function () {
+    var that = this;
+
+    $("input", this.footer()).on("keyup change clear", function () {
+      if (that.search() !== this.value) {
+        that.search(this.value).draw();
+      }
     });
   });
 

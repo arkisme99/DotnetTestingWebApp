@@ -7,7 +7,7 @@ namespace DotnetTestingWebApp.Helpers
 {
     public class DataTableResponse<T>
     {
-        public string? Draw { get; set; }
+        public int Draw { get; set; }
         public int RecordsTotal { get; set; }
         public int RecordsFiltered { get; set; }
         public IEnumerable<T>? Data { get; set; }
