@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Helpers;
@@ -113,58 +114,21 @@ namespace DotnetTestingWebApp.Controllers
         [HttpPost]
         public IActionResult GetData()
         {
+
             var req = DataTableHelper.GetDataTableRequest(Request);
 
-            var query = _service.GetAll(); // IQueryable<Product>
-
-            // 🔍 Global Search
-            if (!string.IsNullOrWhiteSpace(req.Search.Value))
+            var columnMap = new Dictionary<string, Expression<Func<Product, object>>>
             {
-                var search = req.Search.Value.ToLower();
+                ["name"] = p => p.Name,
+                ["price"] = p => p.Price!,
+                ["createdAt"] = p => p.CreatedAt!,
+                ["updatedAt"] = p => p.UpdatedAt!
+            };
 
-                query = query.Where(p =>
-                    EF.Functions.Like(p.Name, $"%{search}%") ||
-                    EF.Functions.Like(p.Price.ToString(), $"%{search}%") ||
-                    EF.Functions.Like(p.CreatedAt.ToString(), $"%{search}%") ||
-                    EF.Functions.Like(p.UpdatedAt.ToString(), $"%{search}%"));
-            }
+            var query = _service.GetAll()
+                                .ApplyDataTableRequest(req, columnMap);
 
-            // 🔍 Per-column Search
-            foreach (var col in req.Columns.Where(c => c.Searchable && !string.IsNullOrWhiteSpace(c.Search.Value)))
-            {
-                var search = col.Search.Value.ToLower();
-
-                if (col.Data == "name")
-                    query = query.Where(p => EF.Functions.Like(p.Name, $"%{search}%"));
-                else if (col.Data == "price")
-                    query = query.Where(p => EF.Functions.Like(p.Price.ToString(), $"%{search}%"));
-                else if (col.Data == "createdAt")
-                    query = query.Where(p => EF.Functions.Like(p.CreatedAt.ToString(), $"%{search}%"));
-                else if (col.Data == "updatedAt")
-                    query = query.Where(p => EF.Functions.Like(p.UpdatedAt.ToString(), $"%{search}%"));
-            }
-
-            // 🔽 Sorting (pakai order yang dikirim DataTables)
-            if (req.Order.Count > 0)
-            {
-                var firstOrder = req.Order.First();
-                var sortCol = req.Columns[firstOrder.Column].Data;
-                var dir = firstOrder.Dir;
-
-                query = (sortCol, dir) switch
-                {
-                    ("name", "asc") => query.OrderBy(p => p.Name),
-                    ("name", "desc") => query.OrderByDescending(p => p.Name),
-                    ("price", "asc") => query.OrderBy(p => p.Price),
-                    ("price", "desc") => query.OrderByDescending(p => p.Price),
-                    ("createdAt", "asc") => query.OrderBy(p => p.CreatedAt),
-                    ("createdAt", "desc") => query.OrderByDescending(p => p.CreatedAt),
-                    ("updatedAt", "asc") => query.OrderBy(p => p.UpdatedAt),
-                    ("updatedAt", "desc") => query.OrderByDescending(p => p.UpdatedAt),
-                    _ => query
-                };
-            }
-
+            // var sqlnya = query.ToQueryString();
             var recordsTotal = query.Count();
             var data = query.Skip(req.Start).Take(req.Length).ToList();
 
@@ -173,7 +137,8 @@ namespace DotnetTestingWebApp.Controllers
                 Draw = req.Draw,
                 RecordsFiltered = recordsTotal,
                 RecordsTotal = recordsTotal,
-                Data = data
+                // QueryString = sqlnya,
+                Data = data,
             });
         }
     }
