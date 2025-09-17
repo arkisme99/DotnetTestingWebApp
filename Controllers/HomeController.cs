@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Resources;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Middlewares;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace DotnetTestingWebApp.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController() : Controller
     {
+
+
         public IActionResult Index(string? message)
         {
             if (!string.IsNullOrEmpty(message))

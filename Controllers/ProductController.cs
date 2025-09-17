@@ -11,13 +11,13 @@ using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace DotnetTestingWebApp.Controllers
 {
     [Authorize]
-    public class ProductController(IProductService service) : Controller
+    public class ProductController(IProductService _service, IStringLocalizer<SharedResource> localizer) : Controller
     {
-        private readonly IProductService _service = service;
 
         [HasPermission("ViewProduct")]
         public async Task<IActionResult> Index()
@@ -44,7 +44,7 @@ namespace DotnetTestingWebApp.Controllers
             {
                 await _service.StoreAsync(product);
                 TempData["TypeMessage"] = "success";
-                TempData["ValueMessage"] = "Product berhasil dibuat!";
+                TempData["ValueMessage"] = localizer["PesanTambahSukses"].Value;
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -69,8 +69,9 @@ namespace DotnetTestingWebApp.Controllers
             if (ModelState.IsValid)
             {
                 await _service.UpdateAsync(product);
+
                 TempData["TypeMessage"] = "success";
-                TempData["ValueMessage"] = "Product berhasil diupdate!";
+                TempData["ValueMessage"] = localizer["PesanUbahSukses"].Value;
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -84,7 +85,7 @@ namespace DotnetTestingWebApp.Controllers
         {
             await _service.DeleteAsync(id);
             TempData["TypeMessage"] = "success";
-            TempData["ValueMessage"] = "Product berhasil dihapus!";
+            TempData["ValueMessage"] = localizer["PesanHapusSukses"].Value;
             return RedirectToAction(nameof(Index));
         }
 
@@ -100,12 +101,12 @@ namespace DotnetTestingWebApp.Controllers
             if (deletedCount > 0)
             {
                 TempData["TypeMessage"] = "success";
-                TempData["ValueMessage"] = $"{deletedCount} produk berhasil dihapus.";
+                TempData["ValueMessage"] = $"{deletedCount} Data {localizer["PesanHapusSukses"].Value}";
             }
             else
             {
                 TempData["TypeMessage"] = "warning";
-                TempData["ValueMessage"] = "Tidak ada produk yang dihapus.";
+                TempData["ValueMessage"] = localizer["PesanHapusBatal"].Value;
             }
 
             return RedirectToAction(nameof(Index));

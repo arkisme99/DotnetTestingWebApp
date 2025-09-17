@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="id">
+﻿@using System.Globalization
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentCulture.Name">
 
 <head>
     <meta charset="utf-8">
@@ -14,6 +15,12 @@
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/dist/css/adminlte.min.css" asp-append-version="true">
     <link rel="shortcut icon" href="~/dist/img/AdminLTELogo.png" type="image/x-icon">
+
+    <script>
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -52,7 +59,6 @@
     </div>
 
     <script src="~/plugins/jquery/jquery.min.js"></script>
-
     <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
@@ -72,16 +78,15 @@
                 } else {
                     $('nav.main-header').removeClass('navbar-dark').addClass('navbar-white navbar-light');
                     $('#darkModeToggle i').removeClass('fa-sun').addClass('fa-moon');
+                    document.documentElement.classList.remove('dark-mode');
                 }
             }
-
             // Cek status dark mode di localStorage dan terapkan saat halaman dimuat
             if (localStorage.getItem('darkMode') === 'enabled') {
                 $('body').addClass('dark-mode');
                 $('nav.main-header').removeClass('navbar-white navbar-light').addClass('navbar-dark');
                 updateDarkModeIcon(); // Perbarui ikon sesuai status
             }
-
             // Event listener untuk toggle dark mode
             $('#darkModeToggle').on('click', function () {
                 $('body').toggleClass('dark-mode');

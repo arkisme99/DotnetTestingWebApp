@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="Batal">
+    <value>Batal</value>
+  </data>
+  <data name="TambahData">
+    <value>Tambah Baru</value>
+  </data>
+  <data name="HapusData">
+    <value>Hapus</value>
+  </data>
+  <data name="Aksi">
+    <value>Aksi</value>
+  </data>
+  <data name="EditData">
+    <value>Ubah</value>
+  </data>
+  <data name="HapusBanyak">
+    <value>Hapus Data Terpilih</value>
+  </data>
+  <data name="SubmitDelete">
+    <value>Ya, Hapus Data</value>
+  </data>
+  <data name="SubmitSave">
+    <value>Simpan Data</value>
+  </data>
+  <data name="SignInText">
+    <value>Masuk untuk memulai sesi Anda</value>
+  </data>
+  <data name="Login">
+    <value>Masuk</value>
+  </data>
+  <data name="PesanTambahSukses">
+    <value>Tambah Data Sukses</value>
+  </data>
+  <data name="PesanUbahSukses">
+    <value>Ubah Data Sukses</value>
+  </data>
+  <data name="PesanHapusSukses">
+    <value>Hapus Sukses</value>
+  </data>
+  <data name="PesanHapusBatal">
+    <value>Tidak ada data yang dihapus</value>
+  </data>
+</root>

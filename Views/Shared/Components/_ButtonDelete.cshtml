@@ -1,3 +1,6 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
 @{
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var permissionName = $"Delete{controllerName}";
@@ -5,5 +8,5 @@
 @if (User.HasClaim("Permission", permissionName))
 {
     <a class="dropdown-item delete-record" href="javascript:;" data-id="@ViewData["DataId"]"
-        data-title="@ViewData["DataTitle"]"><i class="fas fa-trash"></i> Hapus</a>
+        data-title="@ViewData["DataTitle"]"><i class="fas fa-trash"></i> @Localizer["HapusData"]</a>
 }

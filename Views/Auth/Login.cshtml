@@ -1,10 +1,12 @@
 @using Microsoft.AspNetCore.Html
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 @{
     ViewData["Title"] = "Login Page";
 }
 
-<p class="login-box-msg">Sign in to start your session</p>
+<p class="login-box-msg">@Localizer["SignInText"]</p>
 
 <form asp-action="Login" method="post" id="formProccess">
     
@@ -18,7 +20,7 @@
     </div>
     <!-- /.col -->
     <div class="col-6">
-      @await Html.PartialAsync("Components/_SubmitPrimary", new ViewDataDictionary(ViewData) { { "Id", "btnSubmit" }, { "Label", "Login" } })
+      @await Html.PartialAsync("Components/_SubmitPrimary", new ViewDataDictionary(ViewData) { { "Id", "btnSubmit" }, { "Label", Localizer["Login"] } })
     </div>
     <!-- /.col -->
   </div>

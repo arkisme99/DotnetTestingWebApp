@@ -1,3 +1,4 @@
+using System.Globalization;
 using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
@@ -5,7 +6,9 @@ using DotnetTestingWebApp.Seeders;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,15 +65,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-//MVC
-builder.Services.AddControllersWithViews();
-
 // Add services to the container.
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-// Tambahkan service sebelum Build()
-builder.Services.AddControllersWithViews();
 
 // Routing lowercase
 builder.Services.AddRouting(options =>
@@ -79,7 +76,6 @@ builder.Services.AddRouting(options =>
     options.LowercaseQueryStrings = true; // optional
 });
 
-builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 
 builder.Services.AddAuthorizationBuilder()
@@ -89,7 +85,39 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
 
+// Tambahkan localization
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("en"),
+        new CultureInfo("es"),
+        new CultureInfo("fr")
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("en");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+
+    // Gunakan cookie untuk menyimpan pilihan bahasa user
+    options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+});
+
+
 var app = builder.Build();
+
+var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
+
+// Gunakan cookie untuk simpan pilihan bahasa
+/* localizationOptions.RequestCultureProviders.Insert(1, new QueryStringRequestCultureProvider());
+localizationOptions.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider()); */
 
 // 🔹 panggil seeder di sini
 using (var scope = app.Services.CreateScope())
@@ -106,6 +134,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// app.UseRequestLocalization(localizationOptions);
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -118,8 +148,7 @@ app.Use(async (context, next) =>
     if (context.User?.Identity?.IsAuthenticated == true)
     {
         if (context.Request.Path.StartsWithSegments("/auth/login") ||
-            context.Request.Path.StartsWithSegments("/login") ||
-            context.Request.Path.StartsWithSegments("/"))
+            context.Request.Path.StartsWithSegments("/login"))
         {
             context.Response.Redirect("/home/index");
             return;

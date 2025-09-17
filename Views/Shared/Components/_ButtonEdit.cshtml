@@ -1,8 +1,11 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
 @{
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var permissionName = $"Edit{controllerName}";
 }
 @if (User.HasClaim("Permission", permissionName))
 {
-    <a class="dropdown-item edit-record" href='@ViewData["LinkPath"]'><i class="fas fa-edit"></i> Ubah</a>
+    <a class="dropdown-item edit-record" href='@ViewData["LinkPath"]'><i class="fas fa-edit"></i> @Localizer["EditData"]</a>
 }

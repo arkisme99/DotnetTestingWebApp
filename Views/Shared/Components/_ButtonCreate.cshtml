@@ -1,3 +1,6 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
 @{
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var permissionName = $"Create{controllerName}";
@@ -5,5 +8,5 @@
 @if (User.HasClaim("Permission", permissionName))
 {
     <a asp-area="" asp-controller="@ViewData["LinkController"]" asp-action="@ViewData["LinkAction"]"
-        class="btn btn-sm bg-gradient-success"><i class="fas fa-plus"></i> Tambah</a>
+        class="btn btn-sm bg-gradient-success"><i class="fas fa-plus"></i> @Localizer["TambahData"]</a>
 }

@@ -1,1 +1,3 @@
-<button type="submit" class="btn btn-outline-light delete">Ya, Hapus Data</button>
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+<button type="submit" class="btn btn-outline-light delete">@Localizer["SubmitDelete"]</button>

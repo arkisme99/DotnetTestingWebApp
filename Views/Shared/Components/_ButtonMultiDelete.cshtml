@@ -1,9 +1,13 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
 @{
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
     var permissionName = $"MultiDelete{controllerName}";
 }
 @if (User.HasClaim("Permission", permissionName))
 {
-    <a href='javascript:;' class='btn btn-sm bg-gradient-danger' id="btn-delete-multi"><i class='fas fa-trash'></i> Hapus
-        Data Dipilih</a>
+    <a href='javascript:;' class='btn btn-sm bg-gradient-danger' id="btn-delete-multi"><i class='fas fa-trash'></i>
+        @Localizer["HapusBanyak"]</a>
 }

@@ -1,4 +1,6 @@
 @model Microsoft.AspNetCore.Html.IHtmlContent
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 
 @{
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
@@ -8,7 +10,7 @@
 @if (User.HasClaim("Permission", permissionNamea) || User.HasClaim("Permission", permissionNameb))
 {
     <a href="javascript:;" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i
-            class="fas fa-cog"></i> Action</a>
+            class="fas fa-cog"></i> @Localizer["Aksi"]</a>
 
     @Model
 }

@@ -161,13 +161,13 @@
         };
 
         let dtURL = "@Url.Action("GetData", "Product")";
-        let deleteDataUrl = `product/delete/:id`;
+        let deleteDataUrl = `/product/delete/:id`;
         
         const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 3, 'product')
     });
 
     $("#btn-delete-multi").on("click", function () {
-        let multiDeleteDataUrl = `product/multi-delete`;
+        let multiDeleteDataUrl = `/product/multi-delete`;
         hapusmulti(multiDeleteDataUrl);
     });
 
