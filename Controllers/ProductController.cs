@@ -51,7 +51,7 @@ namespace DotnetTestingWebApp.Controllers
         }
 
         [HasPermission("EditProduct")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(Guid id)
         {
             var product = await _service.GetByIdAsync(id);
             if (product == null) return NotFound();
@@ -62,7 +62,7 @@ namespace DotnetTestingWebApp.Controllers
         [HasPermission("EditProduct")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product)
+        public async Task<IActionResult> Edit(Guid id, Product product)
         {
             if (id != product.Id) return NotFound();
 
@@ -81,7 +81,7 @@ namespace DotnetTestingWebApp.Controllers
         [HasPermission("DeleteProduct")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             await _service.DeleteAsync(id);
             TempData["TypeMessage"] = "success";

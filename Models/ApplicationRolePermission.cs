@@ -9,8 +9,7 @@ namespace DotnetTestingWebApp.Models
     {
         public string? RoleId { get; set; }
         public ApplicationRole? Role { get; set; }
-
-        public int PermissionId { get; set; }
+        public Guid PermissionId { get; set; }
         public Permission? Permission { get; set; }
     }
 }

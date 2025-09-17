@@ -56,8 +56,8 @@ namespace DotnetTestingWebApp.Migrations
                     b.Property<string>("RoleId")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("PermissionId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("ApplicationRoleId")
                         .HasColumnType("varchar(255)");
@@ -137,11 +137,9 @@ namespace DotnetTestingWebApp.Migrations
 
             modelBuilder.Entity("DotnetTestingWebApp.Models.Permission", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -154,12 +152,10 @@ namespace DotnetTestingWebApp.Migrations
 
             modelBuilder.Entity("DotnetTestingWebApp.Models.Product", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("char(36)")
                         .HasColumnName("id");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("timestamp")

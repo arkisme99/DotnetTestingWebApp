@@ -33,12 +33,12 @@ namespace DotnetTestingWebApp.Data
         {
             var entries = ChangeTracker
                 .Entries()
-                .Where(e => e.Entity is Product &&
+                .Where(e => e.Entity is AuditableEntity &&
                             (e.State == EntityState.Added || e.State == EntityState.Modified));
 
             foreach (var entityEntry in entries)
             {
-                var entity = (Product)entityEntry.Entity;
+                var entity = (AuditableEntity)entityEntry.Entity;
 
                 if (entityEntry.State == EntityState.Added)
                 {
@@ -46,8 +46,7 @@ namespace DotnetTestingWebApp.Data
                 }
                 else
                 {
-                    // Pastikan CreatedAt tidak ikut diubah saat update
-                    entityEntry.Property(nameof(Product.CreatedAt)).IsModified = false;
+                    entityEntry.Property(nameof(AuditableEntity.CreatedAt)).IsModified = false;
                 }
 
                 entity.UpdatedAt = DateTime.Now;

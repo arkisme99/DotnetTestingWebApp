@@ -30,7 +30,7 @@ namespace DotnetTestingWebApp.Services
             return product;
         }
 
-        public async Task<Product> GetByIdAsync(int id)
+        public async Task<Product> GetByIdAsync(Guid id)
         {
             var data = await _context.Products.FindAsync(id);
             return data!;
@@ -43,7 +43,7 @@ namespace DotnetTestingWebApp.Services
             return product;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product != null)
@@ -60,7 +60,7 @@ namespace DotnetTestingWebApp.Services
 
             // pecah string id "1,2,3"
             var idList = ids.Split(',')
-                            .Select(id => int.TryParse(id, out var parsed) ? parsed : (int?)null)
+                            .Select(id => Guid.TryParse(id, out var parsed) ? parsed : (Guid?)null)
                             .Where(id => id.HasValue)
                             .Select(id => id!.Value)
                             .ToList();

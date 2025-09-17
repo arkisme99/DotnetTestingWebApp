@@ -5,6 +5,7 @@
 - Authentication (Login, Role & Permission)
 - Multi Lang Label (id, en)
 - Send Email
+- Implementasi UUID
 
 ```
 dotnet user-secrets init
