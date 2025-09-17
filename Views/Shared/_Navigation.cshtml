@@ -4,9 +4,9 @@
 @inject IStringLocalizer<SharedResource> Localizer
 @{
     var roles = User.Claims
-                    .Where(c => c.Type == ClaimTypes.Role)
-                    .Select(c => c.Value)
-                    .ToList();
+    .Where(c => c.Type == ClaimTypes.Role)
+    .Select(c => c.Value)
+    .ToList();
 }
 
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -81,31 +81,36 @@
 
                 @if (User.HasClaim("Permission", "ViewUser") || User.HasClaim("Permission", "ViewRole"))
                 {
-                    <li class="nav-item @(Context.Request.Path.StartsWithSegments("/user") ? "menu-open" : "")">
-                        <a class="nav-link @(Context.Request.Path.StartsWithSegments("/user") ? "active" : "")">
+                    <li
+                        class="nav-item @(Context.Request.Path.StartsWithSegments("/user") || Context.Request.Path.StartsWithSegments("/role") ? "menu-open" : "")">
+                        <a
+                            class="nav-link @(Context.Request.Path.StartsWithSegments("/user") || Context.Request.Path.StartsWithSegments("/role") ? "active" : "")">
                             <i class="nav-icon fas fa-users"></i>
                             <p>
                                 @Localizer["MenuUser"] <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">
-                        @if (User.HasClaim("Permission", "ViewRole"))
-                {
-                            <li class="nav-item">
-                            <a asp-area="" asp-controller="Product" asp-action="Index" class="nav-link  @(Context.Request.Path.StartsWithSegments("/user") ? "active" : "")">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>@Localizer["MenuRole"]</p>
-                            </a>
-                            </li>
-                        }
-                        @if (User.HasClaim("Permission", "ViewUser")){
-                            <li class="nav-item">
-                            <a asp-area="" asp-controller="Product" asp-action="Index" class="nav-link  @(Context.Request.Path.StartsWithSegments("/user") ? "active" : "")">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>@Localizer["MenuUser"]</p>
-                            </a>
-                            </li>
-                        }
+                            @if (User.HasClaim("Permission", "ViewRole"))
+                            {
+                                <li class="nav-item">
+                                    <a asp-area="" asp-controller="Role" asp-action="Index"
+                                        class="nav-link @(Context.Request.Path.StartsWithSegments("/role") ? "active" : "")">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["MenuRole"]</p>
+                                    </a>
+                                </li>
+                            }
+                            @if (User.HasClaim("Permission", "ViewUser"))
+                            {
+                                <li class="nav-item">
+                                    <a asp-area="" asp-controller="Role" asp-action="Index"
+                                        class="nav-link  @(Context.Request.Path.StartsWithSegments("/user") ? "active" : "")">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["MenuUser"]</p>
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </li>
                 }

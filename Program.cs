@@ -69,6 +69,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // Routing lowercase
 builder.Services.AddRouting(options =>

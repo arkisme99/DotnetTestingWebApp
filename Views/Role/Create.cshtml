@@ -1,0 +1,88 @@
+@using Microsoft.AspNetCore.Html
+@using DotnetTestingWebApp.Helpers
+@model Dictionary<string, List<DotnetTestingWebApp.Models.Permission>>
+
+@{
+    ViewData["Title"] = "Role Page";
+
+    var inputRoleName = new ViewDataDictionary(ViewData) { { "Label", "Nama Role" }, { "Name", "Name" }, { "Attributes",
+"type=\"text\" placeholder=\"Masukan nama role\" autofocus=\"true\" autocomplete=\"off\" required" } };
+
+    var inputRoleDeskripsi = new ViewDataDictionary(ViewData) { { "Label", "Deskripsi Role" }, { "Name", "Description" }, {
+"Attributes", "type=\"text\" placeholder=\"Masukan Deskripsi Role\" autocomplete=\"off\"" } };
+
+    var breadcrumb = new List<(string, string, string)>
+{
+("Home", "Index", "Home"),
+("Role", "Index", "Role"),
+("Tambah Data", "", "")
+};
+    var headerParams = new { PageTitle = "Role Manajemen | Tambah Data", breadcrumb };
+}
+
+@await Component.InvokeAsync("PageHeader", headerParams)
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <form asp-action="Create" method="post" id="formProccess">
+                    <card-layout title="Tambah Role Baru">
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_FormInput", inputRoleName)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_FormInput", inputRoleDeskripsi)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_SubmitSave")
+                            </div>
+                        </div>
+                    </card-layout>
+                    <div class="row">
+                        @foreach (var group in Model)
+                        {
+                            <div class="col-md-6">
+                                <card-layout title="@group.Key">
+                                    <div class="row">
+                                        @foreach (var permission in group.Value)
+                                        {
+                                            var words = StringHelper.SplitCamelCase(permission.Name);
+                                            var display = words[0] == "Multi" ? words[0] + " " + words[1] ?? "" : words[0];
+                                            <div class="col-md-4">
+                                                <div class="custom-control custom-checkbox">
+                                                    <input class="custom-control-input custom-control-input-danger"
+                                                        type="checkbox" name="choosePermissions[]" value="@permission.Name"
+                                                        id="permission_@permission.Name">
+                                                    <label for="permission_@permission.Name"
+                                                        class="custom-control-label">@display</label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </card-layout>
+                            </div>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/helpers/js/form-handler.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        handleFormSubmission({
+            formSelector: '#formProccess',
+            buttonSelector: '#btnSave'
+        });
+    </script>
+}

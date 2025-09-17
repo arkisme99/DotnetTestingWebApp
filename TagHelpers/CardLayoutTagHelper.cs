@@ -30,16 +30,6 @@ namespace DotnetTestingWebApp.TagHelpers
 
             var childContent = (await output.GetChildContentAsync()).GetContent();
 
-            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-            {
-                { "LinkController", "Product" },
-                { "LinkAction", "Create" }
-            };
-
-            var buttonCreate = await _htmlHelper.PartialAsync(
-                "Components/_ButtonCreate", viewData
-            );
-
             var buttonMultiDelete = await _htmlHelper.PartialAsync("Components/_ButtonMultiDelete");
 
             output.Content.AppendHtml("<div class='card-header'>");
@@ -48,6 +38,18 @@ namespace DotnetTestingWebApp.TagHelpers
 
             if (!string.IsNullOrEmpty(ButtonCreateLink))
             {
+                var parts = ButtonCreateLink.Split('/');
+                string controller = parts.Length > 0 ? parts[0] : "";
+                string action = parts.Length > 1 ? parts[1] : "";
+                var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    { "LinkController", controller },
+                    { "LinkAction", action }
+                };
+
+                var buttonCreate = await _htmlHelper.PartialAsync(
+                    "Components/_ButtonCreate", viewData
+                );
                 output.Content.AppendHtml(buttonCreate);
             }
             // tombol delete multi
