@@ -97,8 +97,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     var supportedCultures = new[]
     {
         new CultureInfo("en"),
-        new CultureInfo("es"),
-        new CultureInfo("fr")
+        new CultureInfo("id")
     };
 
     options.DefaultRequestCulture = new RequestCulture("en");
@@ -106,14 +105,13 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedUICultures = supportedCultures;
 
     // Gunakan cookie untuk menyimpan pilihan bahasa user
-    options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+    options.RequestCultureProviders.Clear();
+    options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
+    // options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
 });
 
 
 var app = builder.Build();
-
-var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
-app.UseRequestLocalization(locOptions.Value);
 
 // Gunakan cookie untuk simpan pilihan bahasa
 /* localizationOptions.RequestCultureProviders.Insert(1, new QueryStringRequestCultureProvider());
@@ -139,6 +137,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
+
 app.UseRouting();
 app.UseAuthentication();
 
@@ -148,7 +149,8 @@ app.Use(async (context, next) =>
     if (context.User?.Identity?.IsAuthenticated == true)
     {
         if (context.Request.Path.StartsWithSegments("/auth/login") ||
-            context.Request.Path.StartsWithSegments("/login"))
+            context.Request.Path.StartsWithSegments("/login") ||
+            context.Request.Path.StartsWithSegments("/"))
         {
             context.Response.Redirect("/home/index");
             return;
