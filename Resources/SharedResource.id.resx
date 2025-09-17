@@ -42,4 +42,16 @@
   <data name="PesanHapusBatal">
     <value>Tidak ada data yang dihapus</value>
   </data>
+  <data name="MenuBeranda">
+    <value>Beranda</value>
+  </data>
+  <data name="MenuUser">
+    <value>Manajemen Pengguna</value>
+  </data>
+  <data name="MenuRole">
+    <value>Peran &amp; Izin</value>
+  </data>
+  <data name="MenuProduk">
+    <value>Manajemen Produk</value>
+  </data>
 </root>

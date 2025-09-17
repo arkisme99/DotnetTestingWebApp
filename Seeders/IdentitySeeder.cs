@@ -40,6 +40,11 @@ namespace DotnetTestingWebApp.Seeders
                 new() { Name = "EditUser" },
                 new() { Name = "DeleteUser" },
                 new() { Name = "MultiDeleteUser" },
+                new() { Name = "ViewRole" },
+                new() { Name = "CreateRole" },
+                new() { Name = "EditRole" },
+                new() { Name = "DeleteRole" },
+                new() { Name = "MultiDeleteRole" },
                 new() { Name = "ViewProduct" },
                 new() { Name = "CreateProduct" },
                 new() { Name = "EditProduct" },
@@ -81,6 +86,7 @@ namespace DotnetTestingWebApp.Seeders
 
             // 4. Seed Default Admin User
             string adminEmail = "admin@example.com";
+            string fullName = "Admin Aplikasi";
             string adminPassword = "Admin123!"; // hashed otomatis
 
             if (await userManager.FindByEmailAsync(adminEmail) == null)
@@ -89,7 +95,8 @@ namespace DotnetTestingWebApp.Seeders
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    FullName = fullName,
                 };
 
                 var result = await userManager.CreateAsync(user, adminPassword);
@@ -126,6 +133,7 @@ namespace DotnetTestingWebApp.Seeders
 
             // 6. Seed Default Admin User
             string userEmail = "user@example.com";
+            string fullNameUser = "User Aplikasi";
             string userPassword = "User123!"; // hashed otomatis
 
             if (await userManager.FindByEmailAsync(userEmail) == null)
@@ -134,7 +142,8 @@ namespace DotnetTestingWebApp.Seeders
                 {
                     UserName = userEmail,
                     Email = userEmail,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    FullName = fullNameUser,
                 };
 
                 var result = await userManager.CreateAsync(user, userPassword);

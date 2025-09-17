@@ -23,7 +23,6 @@ namespace DotnetTestingWebApp.Controllers
             }
 
             _logger.LogInformation("Ini pesan info di AuthController pada {time}", DateTime.UtcNow);
-            _logger.LogWarning("Ini pesan info di AuthController pada {time}", DateTime.UtcNow);
             return View();
         }
 

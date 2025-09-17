@@ -42,4 +42,16 @@
   <data name="PesanHapusBatal">
     <value>No Data Deleted</value>
   </data>
+  <data name="MenuBeranda">
+    <value>Home Page</value>
+  </data>
+  <data name="MenuUser">
+    <value>User Management</value>
+  </data>
+  <data name="MenuRole">
+    <value>Role &amp; Permissions</value>
+  </data>
+  <data name="MenuProduk">
+    <value>Product Management</value>
+  </data>
 </root>

@@ -43,7 +43,8 @@ namespace DotnetTestingWebApp.Services
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id),
-                new(ClaimTypes.Name, user.UserName ?? user.Email ?? email)
+                new(ClaimTypes.Email, user.UserName ?? user.Email ?? email),
+                new(ClaimTypes.Name, user.FullName ?? "Nama Lengkap")
             };
 
             // role → claim
