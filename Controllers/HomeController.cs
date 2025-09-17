@@ -5,6 +5,7 @@ using System.Linq;
 using System.Resources;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Middlewares;
+using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.Localization;
 namespace DotnetTestingWebApp.Controllers
 {
     [Authorize]
-    public class HomeController() : Controller
+    public class HomeController(IEmailService emailService) : Controller
     {
 
 
@@ -32,9 +33,15 @@ namespace DotnetTestingWebApp.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpGet]
+        public async Task<IActionResult> TestEmail()
         {
-            return View();
+            await emailService.SendEmailAsync(0, "penerima@email.com", "Tes Kirim", "Berhasil guys");
+
+            TempData["TypeMessage"] = "success";
+            TempData["ValueMessage"] = "Tes Kirim Harusnya Berhasil";
+
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
