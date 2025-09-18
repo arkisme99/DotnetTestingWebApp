@@ -155,6 +155,38 @@ namespace DotnetTestingWebApp.Services
             }
         }
 
+        public async Task DeleteAsync(string id)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // cek role ada ga
+                var role = await _context.ApplicationRoles.FirstOrDefaultAsync(r => r.Id == id) ?? throw new Exception("Role not found");
+
+                // Cek apakah ada user yang masih pakai role ini
+                bool hasUsers = await _context.UserRoles.AnyAsync(ur => ur.RoleId == id);
+                if (hasUsers)
+                    throw new Exception("Role is assigned to users, cannot delete");
+
+                // 🗑 Hapus RolePermissions
+                var rolePermissions = _context.RolePermissions.Where(rp => rp.RoleId == id);
+                _context.RolePermissions.RemoveRange(rolePermissions);
+
+                // 🗑 Hapus role
+                _context.ApplicationRoles.Remove(role);
+
+                await _context.SaveChangesAsync();
+
+                // Commit transaction
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         // Fungsi split CamelCase
         static string[] SplitCamelCase(string input)
         {

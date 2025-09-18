@@ -31,6 +31,12 @@
 </tfoot>");
 
     var tableId = new ViewDataDictionary(ViewData) { { "TableId", "role" } };
+    var contentModalDelete = new HtmlString(@"<p>Anda yakin ingin hapus data ?</p><p id='content'></p> ");
+    var idModalDelete = new ViewDataDictionary(ViewData) { { "ModalId", "modal-delete" }, { "FormId", "formHapus" } };
+    var contentModalMultiDelete = new HtmlString(@"<p>Anda yakin ingin hapus data yang terpilih ?</p><input type='hidden'
+name='datahapus' id='datahapus' value=''> ");
+    var idModalMultiDelete = new ViewDataDictionary(ViewData) { {"ModalId","modal-multidelete" }, { "FormId",
+"formHapusMulti" } };
 }
 
 @await Component.InvokeAsync("PageHeader", headerParams)
@@ -48,14 +54,9 @@
     </div>
 </div>
 
-@await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data ?</p>
-< p id = 'content' ></ p > "), new ViewDataDictionary(ViewData) { { "ModalId", "modal-delete" }, { "FormId", "formHapus"
-} })
+@await Html.PartialAsync("Components/_ModalDelete", contentModalDelete, idModalDelete)
 
-@await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data yang terpilih ?</p>
-< input type = 'hidden' name = 'datahapus' id = 'datahapus' value = '' > "), new ViewDataDictionary(ViewData) { {
-"ModalId",
-"modal-multidelete" }, { "FormId", "formHapusMulti" } })
+@await Html.PartialAsync("Components/_ModalDelete", contentModalMultiDelete, idModalMultiDelete)
 
 @section Styles
 {
@@ -72,17 +73,17 @@
     <script src="~/helpers/js/format-rupiah.js"></script>
     <script src="~/helpers/js/multi-delete.js"></script>
     <script type="text/template" id="tpl-button-dropdown">
-                                    @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
-                                </script>
+        @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
+    </script>
     <script type="text/template" id="tpl-button-edit">
-                                    @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
-                                </script>
+        @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
+    </script>
     <script type="text/template" id="tpl-button-delete">
-                                    @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
-                                </script>
+        @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
+    </script>
     <script type="text/template" id="tpl-loading-icon">
-                                    @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
-                                </script>
+        @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
+    </script>
     <script>
         $(async function () {
             let columns = [{

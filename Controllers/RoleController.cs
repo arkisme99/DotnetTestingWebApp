@@ -92,6 +92,28 @@ namespace DotnetTestingWebApp.Controllers
             return View(role);
         }
 
+        // POST: Role/Delete/5
+        [HasPermission("DeleteRole")]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            try
+            {
+                await _service.DeleteAsync(id);
+                TempData["TypeMessage"] = "success";
+                TempData["ValueMessage"] = localizer["PesanHapusSukses"].Value;
+            }
+            catch (Exception ex)
+            {
+                TempData["TypeMessage"] = "error";
+                TempData["ValueMessage"] = ex.Message;
+                // return BadRequest(ex.Message);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {

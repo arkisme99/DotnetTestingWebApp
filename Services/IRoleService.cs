@@ -14,5 +14,6 @@ namespace DotnetTestingWebApp.Services
         Task<List<Permission>> GetRoleWithPermissionsAsync(string roleId);
         Task<ApplicationRole> UpdateAsync(ApplicationRole role, List<string> selectedPermissionNames);
         Task<ApplicationRole> StoreAsync(ApplicationRole role, List<string> selectedPermissionNames);
+        Task DeleteAsync(string id);
     }
 }
