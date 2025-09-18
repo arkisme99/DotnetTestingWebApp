@@ -187,6 +187,57 @@ namespace DotnetTestingWebApp.Services
             }
         }
 
+        public async Task<int> DeleteMultisAsync(string ids)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+
+                if (string.IsNullOrWhiteSpace(ids))
+                    return 0;
+
+                var idList = ids.Split(',')
+                                .Select(id => id.Trim())
+                                .Where(id => !string.IsNullOrWhiteSpace(id))
+                                .ToList();
+
+                int deletedCount = 0;
+
+                foreach (var id in idList)
+                {
+                    Console.WriteLine("Masuk Sini : " + id);
+                    // cek role ada ga
+                    var role = await _context.ApplicationRoles.FirstOrDefaultAsync(r => r.Id == id) ?? throw new Exception("Role not found");
+
+                    // Cek apakah ada user yang masih pakai role ini
+                    bool hasUsers = await _context.UserRoles.AnyAsync(ur => ur.RoleId == id);
+                    if (hasUsers)
+                        throw new Exception("Role is assigned to users, cannot delete");
+
+                    // 🗑 Hapus RolePermissions
+                    var rolePermissions = _context.RolePermissions.Where(rp => rp.RoleId == id);
+                    _context.RolePermissions.RemoveRange(rolePermissions);
+
+                    // 🗑 Hapus role
+                    _context.ApplicationRoles.Remove(role);
+
+                    deletedCount++;
+                }
+
+                if (deletedCount > 0)
+                    await _context.SaveChangesAsync();
+                // Commit transaction
+                await transaction.CommitAsync();
+
+                return deletedCount;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         // Fungsi split CamelCase
         static string[] SplitCamelCase(string input)
         {

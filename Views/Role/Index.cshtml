@@ -73,17 +73,17 @@ name='datahapus' id='datahapus' value=''> ");
     <script src="~/helpers/js/format-rupiah.js"></script>
     <script src="~/helpers/js/multi-delete.js"></script>
     <script type="text/template" id="tpl-button-dropdown">
-        @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
-    </script>
+                @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
+            </script>
     <script type="text/template" id="tpl-button-edit">
-        @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
-    </script>
+                @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
+            </script>
     <script type="text/template" id="tpl-button-delete">
-        @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
-    </script>
+                @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
+            </script>
     <script type="text/template" id="tpl-loading-icon">
-        @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
-    </script>
+                @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
+            </script>
     <script>
         $(async function () {
             let columns = [{
@@ -92,6 +92,9 @@ name='datahapus' id='datahapus' value=''> ");
                 searchable: false,
                 render: function (data, type, row, meta) {
                     let check = `<input name='idpilih[]' type="checkbox" id="checkItem" value="${row.id}">`;
+                    if (row.name.toLowerCase() === "administrator") {
+                        check = ""
+                    }
                     return check;
                 }
             },
@@ -163,7 +166,7 @@ name='datahapus' id='datahapus' value=''> ");
             let dtURL = "@Url.Action("GetData", "Role")";
             let deleteDataUrl = `/role/delete/:id`;
 
-            const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 3, 'role')
+            const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 1, 'role')
         });
 
         $("#btn-delete-multi").on("click", function () {
