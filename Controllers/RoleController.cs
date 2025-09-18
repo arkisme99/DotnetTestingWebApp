@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Helpers;
 using DotnetTestingWebApp.Models;
+using DotnetTestingWebApp.Models.ViewModels;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,6 +43,50 @@ namespace DotnetTestingWebApp.Controllers
                 await _service.StoreAsync(role, choosePermissions!);
                 TempData["TypeMessage"] = "success";
                 TempData["ValueMessage"] = localizer["PesanTambahSukses"].Value;
+                return RedirectToAction(nameof(Index));
+            }
+            return View(role);
+        }
+
+        [HasPermission("EditRole")]
+        public async Task<IActionResult> Edit(string id)
+        {
+            var data = await _service.GetByidAsync(id);
+            if (data == null) return NotFound();
+
+            var permissions = await _service.GetPermissionsAsync();
+
+            var currentRolePermissions = await _service.GetRoleWithPermissionsAsync(id);
+
+            var vm = new EditRoleViewModel<ApplicationRole>
+            {
+                Data = data,
+                Permissions = permissions,
+                CurrentRolePermissions = currentRolePermissions
+            };
+
+            Console.WriteLine("CurrentRole Permissions: " + string.Join(", ", currentRolePermissions.Select(p => p.Name)));
+
+
+            return View(vm);
+        }
+
+        //POST : Role/Edit
+        [HasPermission("EditRole")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, ApplicationRole role)
+        {
+            if (id != role.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                var choosePermissions = Request.Form["choosePermissions[]"].ToList();
+                // Console.WriteLine("Choose Permissions: " + string.Join(", ", choosePermissions));
+
+                await _service.UpdateAsync(role, choosePermissions!);
+                TempData["TypeMessage"] = "success";
+                TempData["ValueMessage"] = localizer["PesanUbahSukses"].Value;
                 return RedirectToAction(nameof(Index));
             }
             return View(role);
