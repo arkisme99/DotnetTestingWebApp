@@ -1,0 +1,11 @@
+@model Microsoft.AspNetCore.Html.IHtmlContent
+<div class="form-group">
+    <label for="@ViewData["Id"]">@ViewData["Label"]</label>
+    <select name="@ViewData["Name"]" id="@ViewData["Id"]" class="select2 form-control" style="width: 100%;"
+        @Html.Raw(ViewData["Attributes"])>
+        @Model
+    </select>
+    <span class="text-danger invalid-feedback">
+        @Html.ValidationMessage(ViewData["Name"]!.ToString())
+    </span>
+</div>

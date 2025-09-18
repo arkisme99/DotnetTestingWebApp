@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Helpers;
 using DotnetTestingWebApp.Models;
+using DotnetTestingWebApp.Models.Dto;
 using DotnetTestingWebApp.Models.ViewModels;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 
 namespace DotnetTestingWebApp.Controllers
@@ -114,7 +116,7 @@ namespace DotnetTestingWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HasPermission("MultiDeleteProduct")]
+        [HasPermission("MultiDeleteRole")]
         [HttpPost, ActionName("multi-delete")]
         public async Task<IActionResult> MultiDelete(string datahapus)
         {
@@ -173,6 +175,34 @@ namespace DotnetTestingWebApp.Controllers
                 // QueryString = sqlnya,
                 Data = data,
             });
+        }
+
+
+        [HttpGet("role/select2")]
+        public async Task<IActionResult> GetRolesForSelect2(string? q)
+        {
+            var query = _service.GetAll();
+
+            if (!string.IsNullOrEmpty(q))
+            {
+                // Filter seperti Select2 "search"
+                query = query.Where(r => r.Name!.Contains(q)).Take(5);
+            }
+            else
+            {
+                // Default ambil 5 data pertama
+                query = query.Take(5);
+            }
+
+            var roles = await query
+                .Select(r => new SelectTwoDto
+                {
+                    Id = r.Id,         // biasanya string (GUID) kalau pakai IdentityRole
+                    Text = r.Name!
+                })
+                .ToListAsync();
+
+            return Ok(new { results = roles });
         }
     }
 }

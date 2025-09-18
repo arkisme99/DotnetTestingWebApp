@@ -104,7 +104,7 @@
                             @if (User.HasClaim("Permission", "ViewUser"))
                             {
                                 <li class="nav-item">
-                                    <a asp-area="" asp-controller="Role" asp-action="Index"
+                                    <a asp-area="" asp-controller="User" asp-action="Index"
                                         class="nav-link  @(Context.Request.Path.StartsWithSegments("/user") ? "active" : "")">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["MenuUser"]</p>

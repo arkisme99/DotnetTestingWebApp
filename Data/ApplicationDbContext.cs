@@ -14,6 +14,7 @@ namespace DotnetTestingWebApp.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ApplicationRolePermission> RolePermissions { get; set; }
 
         public override int SaveChanges()

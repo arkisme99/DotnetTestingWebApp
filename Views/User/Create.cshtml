@@ -1,0 +1,112 @@
+@using Microsoft.AspNetCore.Html
+@using DotnetTestingWebApp.Helpers
+@using Microsoft.Extensions.Localization
+@model Dictionary<string, List<DotnetTestingWebApp.Models.Permission>>
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    ViewData["Title"] = $"{Localizer["MenuUser"]}";
+
+    var inputUserName = new ViewDataDictionary(ViewData) { { "Label", "Username (Email)" }, { "Name", "UserName" }, {
+"Attributes",
+"type=\"email\" placeholder=\"Masukan Username\" autofocus=\"true\" autocomplete=\"off\" required" } };
+
+    var inputFullName = new ViewDataDictionary(ViewData) { { "Label", "Nama Lengkap" }, { "Name", "Fullname" }, {
+"Attributes", "type=\"text\" placeholder=\"Masukan Nama Lengkap\" autocomplete=\"off\" required" } };
+
+    var inputPassword = new ViewDataDictionary(ViewData) { { "Label", "Password" }, { "Name", "Password" }, {
+"Attributes", "type=\"password\" placeholder=\"Masukan Password\" autocomplete=\"off\" required" } };
+
+    var selectRole = new ViewDataDictionary(ViewData) { { "Label", "Pilih Role" }, { "Name", "Roles[]" }, { "Id",
+"ChooseRole" }, {
+"Attributes", "required multiple" } };
+
+    var optionRole = new HtmlString(@"");
+
+    var breadcrumb = new List<(string, string, string)>
+{
+("Home", "Index", "Home"),
+("User", "Index", "User"),
+("Tambah Data", "", "")
+};
+    var headerParams = new { PageTitle = $"{Localizer["MenuUser"]} | {Localizer["TambahData"]}", breadcrumb };
+}
+
+@await Component.InvokeAsync("PageHeader", headerParams)
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <form asp-action="Create" method="post" id="formProccess">
+                    <card-layout title="@Localizer["TambahData"] @Localizer["MenuUser"]">
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_FormInput", inputUserName)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_FormInput", inputFullName)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_FormInput", inputPassword)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_Select2", optionRole, selectRole)
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                @await Html.PartialAsync("Components/_SubmitSave")
+                            </div>
+                        </div>
+                    </card-layout>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css" />
+}
+@section Scripts {
+    <script src="~/helpers/js/form-handler.js"></script>
+    <script src="~/plugins/select2/js/select2.full.min.js"></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(function () {
+            handleFormSubmission({
+                formSelector: '#formProccess',
+                buttonSelector: '#btnSave'
+            });
+
+            $('#ChooseRole').select2({
+                ajax: {
+                    url: '/role/select2',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term // keyword pencarian
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results
+                        };
+                    }
+                },
+                placeholder: 'Pilih Role',
+                            @* minimumInputLength: 1 *@
+                        });
+                    });
+    </script>
+}
