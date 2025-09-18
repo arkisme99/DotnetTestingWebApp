@@ -2,10 +2,16 @@
 
 - Pattern MVC + Service
 - Components Views
-- Authentication (Login, Role & Permission)
+- Authentication (Login, Logout)
 - Multi Lang Label (id, en)
 - Send Email
 - Implementasi UUID
+- Dark Mode Admin Lte
+- Implementasi DataTable Server Side
+- Role Management
+- User Management
+
+#Set database on development
 
 ```
 dotnet user-secrets init
