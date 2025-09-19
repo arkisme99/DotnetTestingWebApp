@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DotnetTestingWebApp.Models
 {
-    public class ApplicationRolePermission
+    public class ApplicationRolePermission : AuditableEntity
     {
         public string? RoleId { get; set; }
         public ApplicationRole? Role { get; set; }

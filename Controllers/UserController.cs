@@ -154,6 +154,31 @@ namespace DotnetTestingWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HasPermission("DeleteProduct")]
+        public IActionResult Recycle()
+        {
+            return View();
+        }
+
+        //POST : Role/Delete
+        [HasPermission("DeleteUser")]
+        [HttpPost, ActionName("Restore")]
+        public async Task<IActionResult> Restore(string id)
+        {
+            try
+            {
+                await _service.RestoreAsync(id);
+                TempData["TypeMessage"] = "success";
+                TempData["ValueMessage"] = "Proses Restore Sukses";
+            }
+            catch (Exception ex)
+            {
+                TempData["TypeMessage"] = "warning";
+                TempData["ValueMessage"] = ex.Message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {
@@ -168,6 +193,35 @@ namespace DotnetTestingWebApp.Controllers
             };
 
             var query = _service.GetAll()
+                                .ApplyDataTableRequest(req, columnMap);
+
+            var recordsTotal = query.Count();
+            var data = query.Skip(req.Start).Take(req.Length).ToList();
+
+            return Json(new DataTableResponse<UserListDto>
+            {
+                Draw = req.Draw,
+                RecordsFiltered = recordsTotal,
+                RecordsTotal = recordsTotal,
+                Data = data,
+            });
+        }
+
+        [HttpPost]
+        public IActionResult GetDataDeleted()
+        {
+
+            var req = DataTableHelper.GetDataTableRequest(Request);
+
+            var columnMap = new Dictionary<string, Expression<Func<UserListDto, object>>>
+            {
+                ["fullName"] = p => p.FullName!,
+                ["userName"] = p => p.UserName!,
+                ["email"] = p => p.Email!,
+                ["deletedAt"] = p => p.DeletedAt!,
+            };
+
+            var query = _service.GetAllDeleted()
                                 .ApplyDataTableRequest(req, columnMap);
 
             var recordsTotal = query.Count();

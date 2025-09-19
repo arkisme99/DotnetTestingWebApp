@@ -11,6 +11,7 @@ namespace DotnetTestingWebApp.Models.Dto
         public string FullName { get; set; } = default!;
         public string UserName { get; set; } = default!;
         public string Email { get; set; } = default!;
+        public string DeletedAt { get; set; } = default!;
         public List<string> Roles { get; set; } = [];
     }
 

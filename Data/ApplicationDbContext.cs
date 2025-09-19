@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -86,7 +87,26 @@ namespace DotnetTestingWebApp.Data
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId);
 
-            builder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
+            // setup manual soft deleted
+            // builder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
+
+            //dinamis sotf deleted model
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                // cek apakah entity punya properti "IsDeleted"
+                var prop = entityType.ClrType.GetProperty("IsDeleted");
+                if (prop != null && prop.PropertyType == typeof(bool))
+                {
+                    var parameter = Expression.Parameter(entityType.ClrType, "e");
+                    var property = Expression.Property(parameter, "IsDeleted");
+                    var filter = Expression.Lambda(
+                        Expression.Equal(property, Expression.Constant(false)),
+                        parameter
+                    );
+
+                    builder.Entity(entityType.ClrType).HasQueryFilter(filter);
+                }
+            }
         }
     }
 }

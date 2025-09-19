@@ -1,0 +1,23 @@
+@model Microsoft.AspNetCore.Html.IHtmlContent
+<div class="modal fade" id="@ViewData["ModalId"]">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content bg-warning text-white">
+            <div class="modal-header">
+                <h4 class="modal-title">Restore Data ?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="" id="@ViewData["FormId"]" method="post" class="frm-delete">
+                <div class="modal-body">
+                    @Model
+                </div>
+                <div class="modal-footer">
+                    @await Html.PartialAsync("Components/_ButtonCancel")
+                    @await Html.PartialAsync("Components/_SubmitPrimary", new ViewDataDictionary(ViewData) { { "Id",
+                    "btnSubmit" }, { "Label", "Ya, Restore" } })
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

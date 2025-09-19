@@ -23,8 +23,6 @@ namespace DotnetTestingWebApp.Models
         [Range(typeof(decimal), "1", "9999999999999999", ErrorMessage = "Harga minimal 1")]
         public decimal? Price { get; set; }
 
-        //soft delete
-        public bool IsDeleted { get; set; }
-        public DateTime? DeletedAt { get; set; }
+
     }
 }

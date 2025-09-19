@@ -1,0 +1,175 @@
+@using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Localization
+@using System.Security.Claims
+@inject UserManager<ApplicationUser> UserManager
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    ViewData["Title"] = $"{Localizer["MenuUser"]} | User Terhapus";
+
+    var breadcrumb = new List<(string, string, string)>
+{
+("Home", "Index", "Home"),
+("User", "Index", "User"),
+("User Terhapus", "", "")
+};
+    var headerParams = new { PageTitle = $"{Localizer["MenuUser"]} | User Terhapus", breadcrumb };
+
+    var tableRender = new HtmlString(@"<thead>
+<tr>
+<th width='15%'>Username</th>
+<th width='25%'>Nama Lengkap</th>
+<th width='15%'>Role</th>
+<th width='15%'>Email</th>
+<th width='15%'>Deleted At</th>
+<th width='10%'>Actions</th>
+</tr>
+</thead>
+<tbody></tbody>
+<tfoot>
+<tr>
+<th><input type='text'class='form-control'placeholder='Search Username'/></th>
+<th><input type='text'class='form-control'placeholder='Search Nama Lengkap'/></th>
+<th></th>
+<th><input type='text'class='form-control'placeholder='Search Email'/></th>
+<th><input type='text'class='form-control'placeholder='Search Deleted At'/></th>
+<th></th>
+</tr>
+</tfoot>");
+
+    var tableId = new ViewDataDictionary(ViewData) { { "TableId", "user" } };
+    var contentModalRestore = new HtmlString(@"<p>Anda yakin ingin restore data ?</p><p id='content'></p> ");
+    var idModalRestore = new ViewDataDictionary(ViewData) { { "ModalId", "modal-delete" }, { "FormId", "formHapus" } };
+
+    var buttonDropdown = new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>");
+    var buttonRestore = new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } };
+    var loadingIcon = new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } };
+}
+
+@await Component.InvokeAsync("PageHeader", headerParams)
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <card-layout title="Data @Localizer["MenuUser"]">
+                    @await Html.PartialAsync("Components/_TableOuter", tableRender, tableId)
+                </card-layout>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Html.PartialAsync("Components/_ModalRestore", contentModalRestore, idModalRestore)
+
+@section Styles
+{
+    @{
+        await Html.RenderPartialAsync("_DatatableStylesPartial");
+    }
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_DatatableScriptsPartial");
+    }
+    <script src="~/helpers/js/multi-delete.js"></script>
+    <script src="~/helpers/js/format-date.js"></script>
+    <script type="text/template"
+        id="tpl-button-dropdown">@await Html.PartialAsync("Components/_ButtonDropdown", buttonDropdown)</script>
+    <script type="text/template"
+        id="tpl-button-restore">@await Html.PartialAsync("Components/_ButtonRestore", buttonRestore)</script>
+    <script type="text/template"
+        id="tpl-loading-icon">@await Html.PartialAsync("Components/_LoadingIcon", loadingIcon)</script>
+    <script>
+        $(async function () {
+
+            const currentUserId = "@User.FindFirst(ClaimTypes.NameIdentifier)?.Value";
+            @* console.log(currentUserId) *@
+                let columns = [
+                    {
+                        data: 'userName',
+                        render: function (data, type, row, meta) {
+                            return `${row.userName}`;
+                        }
+                    },
+                    {
+                        data: 'fullName',
+                        render: function (data, type, row, meta) {
+                            return `${row.fullName}`;
+                        }
+                    },
+                    {
+                        data: 'roles',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            return row.roles.map(r => `<span class="badge bg-success">${r}</span>`).join(' ');
+                        }
+                    },
+                    {
+                        data: 'email',
+                        render: function (data, type, row, meta) {
+                            return `${row.email}`;
+                        }
+                    },
+                    {
+                        data: 'deletedAt',
+                        render: function (data, type, row, meta) {
+                            return `${formatDateTimeYMDHIS(row.deletedAt)}`;
+                        }
+                    },
+                    {
+                        data: 'id',
+                        orderable: false,
+                        searchable: false,
+                        render: function (data, type, row, meta) {
+                            let id = row.id;
+                            let title = row.fullName;
+
+                            let tplRestore = $("#tpl-button-restore").html();
+                            tplRestore = tplRestore.replace("__DATAID__", id);
+                            tplRestore = tplRestore.replace("__DATATITLE__", title);
+
+                            let tplDropdown = $("#tpl-button-dropdown").html()
+                            tplDropdown = tplDropdown.replace("__BTN__", tplRestore)
+
+                            let html = '';
+                            html += tplDropdown;
+                            return html;
+                        }
+                    }
+                ];
+
+            let options = {
+                isEnabled: true,
+                saveState: false,
+                hoverClass: 'dt-colresizable-hover',
+                hasBoundCheck: true,
+                minBoundClass: 'dt-colresizable-bound-min',
+                maxBoundClass: 'dt-colresizable-bound-max',
+                isResizable: function (column) {
+                    return true;
+                },
+                onResizeStart: function (column, columns) {
+                },
+                onResize: function (column) {
+                },
+                onResizeEnd: function (column, columns) {
+                },
+                getMinWidthOf: function ($thNode) {
+                },
+                stateSaveCallback: function (settings, data) {
+                },
+                stateLoadCallback: function (settings) {
+                }
+            };
+
+            let dtURL = "@Url.Action("GetDataDeleted", "User")";
+            let deleteDataUrl = `/user/restore/:id`;
+
+            const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 1, 'user')
+        });
+    </script>
+}

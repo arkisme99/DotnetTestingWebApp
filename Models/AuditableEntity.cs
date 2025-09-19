@@ -13,5 +13,11 @@ namespace DotnetTestingWebApp.Models
 
         [Column("updated_at", TypeName = "timestamp")]
         public DateTime? UpdatedAt { get; set; }
+
+        //soft delete
+        [Column("is_deleted")]
+        public bool IsDeleted { get; set; } = false;
+        [Column("deleted_at", TypeName = "timestamp")]
+        public DateTime? DeletedAt { get; set; }
     }
 }

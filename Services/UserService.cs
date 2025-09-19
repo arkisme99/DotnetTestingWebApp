@@ -30,6 +30,24 @@ namespace DotnetTestingWebApp.Services
 
         }
 
+        public IQueryable<UserListDto> GetAllDeleted()
+        {
+            // return _context.Products.IgnoreQueryFilters().Where(p => p.IsDeleted).AsQueryable();
+            return _context.ApplicationUsers.IgnoreQueryFilters().Where(p => p.IsDeleted)
+                    .Select(u => new UserListDto
+                    {
+                        Id = u.Id,
+                        FullName = u.FullName!,
+                        UserName = u.UserName!,
+                        Email = u.Email!,
+                        DeletedAt = u.DeletedAt.ToString()!,
+                        Roles = (from ur in _context.UserRoles
+                                 join r in _context.Roles on ur.RoleId equals r.Id
+                                 where ur.UserId == u.Id
+                                 select r.Name).ToList()
+                    });
+        }
+
         public async Task<ApplicationUser> GetByidAsync(string id)
         {
             var data = await _context.ApplicationUsers.FindAsync(id);
@@ -155,6 +173,20 @@ namespace DotnetTestingWebApp.Services
             }
         }
 
+        public async Task<IdentityResult> SoftDeleteUserAsync(ApplicationUser user)
+        {
+            user.IsDeleted = true;
+            user.DeletedAt = DateTime.UtcNow;
+            return await userManager.UpdateAsync(user);
+        }
+
+        public async Task<IdentityResult> SoftRestoreUserAsync(ApplicationUser user)
+        {
+            user.IsDeleted = false;
+            user.DeletedAt = null;
+            return await userManager.UpdateAsync(user);
+        }
+
         public async Task DeleteAsync(string id)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -162,8 +194,8 @@ namespace DotnetTestingWebApp.Services
             {
                 var user = await userManager.FindByIdAsync(id) ?? throw new Exception("User not found");
 
-                // 1. Hapus semua role user
-                var roles = await userManager.GetRolesAsync(user);
+                // 1. Hapus semua role user, di komen karena hanya soft deleted
+                /* var roles = await userManager.GetRolesAsync(user);
                 if (roles.Any())
                 {
                     var removeRoleResult = await userManager.RemoveFromRolesAsync(user, roles);
@@ -171,10 +203,11 @@ namespace DotnetTestingWebApp.Services
                     {
                         throw new Exception("Failed to clear roles on user");
                     }
-                }
+                } */
 
                 // 2. Hapus user
-                await userManager.DeleteAsync(user);
+                // await userManager.DeleteAsync(user);
+                await this.SoftDeleteUserAsync(user);
                 // Commit transaction
                 await transaction.CommitAsync();
             }
@@ -183,8 +216,23 @@ namespace DotnetTestingWebApp.Services
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
 
-
+        public async Task RestoreAsync(string id)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var user = await _context.ApplicationUsers.IgnoreQueryFilters().FirstAsync(u => u.Id == id) ?? throw new Exception("User not found");
+                await this.SoftRestoreUserAsync(user);
+                // Commit transaction
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<int> DeleteMultisAsync(string ids)
@@ -207,8 +255,8 @@ namespace DotnetTestingWebApp.Services
                 {
                     var user = await userManager.FindByIdAsync(id) ?? throw new Exception("User not found");
 
-                    // 1. Hapus semua role user
-                    var roles = await userManager.GetRolesAsync(user);
+                    // 1. Hapus semua role user, dikkomen karena pakai softdeleted
+                    /* var roles = await userManager.GetRolesAsync(user);
                     if (roles.Any())
                     {
                         var removeRoleResult = await userManager.RemoveFromRolesAsync(user, roles);
@@ -216,10 +264,11 @@ namespace DotnetTestingWebApp.Services
                         {
                             throw new Exception("Failed to clear roles on user");
                         }
-                    }
+                    } */
 
                     // 2. Hapus user
-                    await userManager.DeleteAsync(user);
+                    // await userManager.DeleteAsync(user);
+                    await this.SoftDeleteUserAsync(user);
                     deletedCount++;
                 }
 

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DotnetTestingWebApp.Models
 {
-    public class Permission
+    public class Permission : AuditableEntity
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
