@@ -6,6 +6,7 @@ using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Models.Dto;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
 {
@@ -33,6 +34,22 @@ namespace DotnetTestingWebApp.Services
         {
             var data = await _context.ApplicationUsers.FindAsync(id);
             return data!;
+        }
+
+        public async Task<List<SelectTwoDto>> GetRoleByidUserAsync(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+
+            var userRoles = await (from ur in _context.UserRoles
+                                   join r in _context.Roles on ur.RoleId equals r.Id
+                                   where ur.UserId == user!.Id
+                                   select new SelectTwoDto
+                                   {
+                                       Id = r.Id,
+                                       Text = r.Name!
+                                   }).ToListAsync();
+
+            return userRoles;
         }
 
         public async Task<ApplicationUser> StoreAsync(UserCreateDto dto)
@@ -120,12 +137,8 @@ namespace DotnetTestingWebApp.Services
 
                         foreach (var role in dto.Roles)
                         {
-                            if (!await roleManager.RoleExistsAsync(role))
-                                throw new Exception($"Role {role} does not exist");
-
-                            var addResult = await userManager.AddToRoleAsync(user, role);
-                            if (!addResult.Succeeded)
-                                throw new Exception($"Failed to add role {role}");
+                            var roleEntity = await roleManager.FindByIdAsync(role) ?? throw new Exception($"Role with id {role} does not exist");
+                            await userManager.AddToRoleAsync(user, roleEntity.Name!);
                         }
                     }
 

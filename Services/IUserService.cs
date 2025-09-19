@@ -11,6 +11,7 @@ namespace DotnetTestingWebApp.Services
     {
         IQueryable<UserListDto> GetAll();
         Task<ApplicationUser> GetByidAsync(string id);
+        Task<List<SelectTwoDto>> GetRoleByidUserAsync(string id);
         Task<ApplicationUser> StoreAsync(UserCreateDto dto);
         Task<ApplicationUser> UpdateAsync(string userId, UserCreateDto dto);
     }

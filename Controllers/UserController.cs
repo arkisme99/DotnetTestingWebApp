@@ -9,6 +9,7 @@ using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Models.Dto;
 using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -61,7 +62,19 @@ namespace DotnetTestingWebApp.Controllers
             var data = await _service.GetByidAsync(id);
             if (data == null) return NotFound();
 
-            return View(data);
+            // ambil role yang sudah dimiliki user
+            var userRoles = await _service.GetRoleByidUserAsync(id);
+
+            // lempar ke viewmodel supaya view bisa tau role mana yang selected
+            var vm = new UserCreateDto
+            {
+                UserName = data.UserName!,
+                Fullname = data.FullName!,
+                Email = data.Email,
+                RolesSelected = userRoles
+            };
+
+            return View(vm);
         }
 
         //POST : Role/Edit
@@ -70,13 +83,22 @@ namespace DotnetTestingWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, UserCreateDto dto)
         {
-            if (ModelState.IsValid)
+            try
             {
+                if (ModelState.IsValid)
+                {
+                    await _service.UpdateAsync(id, dto);
+                    TempData["TypeMessage"] = "success";
+                    TempData["ValueMessage"] = localizer["PesanUbahSukses"].Value;
+                    return RedirectToAction(nameof(Index));
+                }
 
-                await _service.UpdateAsync(id, dto);
-                TempData["TypeMessage"] = "success";
-                TempData["ValueMessage"] = localizer["PesanUbahSukses"].Value;
-                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["TypeMessage"] = "error";
+                TempData["ValueMessage"] = ex.Message;
+                // return BadRequest(ex.Message);
             }
 
             return View(dto);

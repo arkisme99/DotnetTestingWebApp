@@ -1,6 +1,8 @@
 @using Microsoft.AspNetCore.Html
 @using DotnetTestingWebApp.Helpers
 @using Microsoft.Extensions.Localization
+@using System.Text
+@model DotnetTestingWebApp.Models.Dto.UserCreateDto
 @inject IStringLocalizer<SharedResource> Localizer
 
 @{
@@ -8,27 +10,38 @@
 
     var inputUserName = new ViewDataDictionary(ViewData) { { "Label", "Username (Email)" }, { "Name", "UserName" }, {
 "Attributes",
-"type=\"email\" placeholder=\"Masukan Username\" autofocus=\"true\" autocomplete=\"off\" required" } };
+$"type=\"email\" placeholder=\"Masukan Username\" autofocus=\"true\" autocomplete=\"off\" value=\"{Model.UserName}\" readonly required" } };
 
-    var inputFullName = new ViewDataDictionary(ViewData) { { "Label", "Nama Lengkap" }, { "Name", "Fullname" }, {
-"Attributes", "type=\"text\" placeholder=\"Masukan Nama Lengkap\" autocomplete=\"off\" required" } };
+var inputFullName = new ViewDataDictionary(ViewData) { { "Label", "Nama Lengkap" }, { "Name", "Fullname" }, {
+"Attributes", $"type=\"text\" placeholder=\"Masukan Nama Lengkap\" autocomplete=\"off\" value=\"{Model.Fullname}\" required" } };
 
-    var inputPassword = new ViewDataDictionary(ViewData) { { "Label", "Password" }, { "Name", "Password" }, {
-"Attributes", "type=\"password\" placeholder=\"Masukan Password\" autocomplete=\"off\" required" } };
-
-    var selectRole = new ViewDataDictionary(ViewData) { { "Label", "Pilih Role" }, { "Name", "Roles[]" }, { "Id",
+var selectRole = new ViewDataDictionary(ViewData) { { "Label", "Pilih Role" }, { "Name", "Roles[]" }, { "Id",
 "ChooseRole" }, {
 "Attributes", "required multiple" } };
 
-    var optionRole = new HtmlString(@"");
+@* var optionRole = new HtmlString(@""); *@
+// bikin isi option selected untuk roles yang sudah ada
+
+var optionRoleHtml = new StringBuilder();
+
+foreach (var role in Model.RolesSelected!)
+    {
+        optionRoleHtml.AppendLine($"<option value=\"{role.Id}\" selected=\"selected\">{role.Text}</option>");
+    }
+
+    var optionRole = new HtmlString(optionRoleHtml.ToString());
 
     var breadcrumb = new List<(string, string, string)>
 {
 ("Home", "Index", "Home"),
 ("User", "Index", "User"),
-("Tambah Data", "", "")
+(Localizer["EditData"], "", "")
 };
-    var headerParams = new { PageTitle = $"{Localizer["MenuUser"]} | {Localizer["TambahData"]}", breadcrumb };
+    var headerParams = new
+    {
+        PageTitle = $"{Localizer["EditData"]} | {Model.Fullname}",
+        breadcrumb
+    };
 }
 
 @await Component.InvokeAsync("PageHeader", headerParams)
@@ -37,7 +50,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <form asp-action="Create" method="post" id="formProccess">
+                <form asp-action="Edit" method="post" id="formProccess">
                     <card-layout title="@Localizer["TambahData"] @Localizer["MenuUser"]">
                         <div class="row">
                             <div class="col-12">
@@ -47,11 +60,6 @@
                         <div class="row">
                             <div class="col-12">
                                 @await Html.PartialAsync("Components/_FormInput", inputFullName)
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                @await Html.PartialAsync("Components/_FormInput", inputPassword)
                             </div>
                         </div>
                         <div class="row">
