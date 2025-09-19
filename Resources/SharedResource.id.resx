@@ -18,6 +18,9 @@
   <data name="HapusBanyak">
     <value>Hapus Data Terpilih</value>
   </data>
+  <data name="RecycleData">
+    <value>Data Terhapus</value>
+  </data>
   <data name="SubmitDelete">
     <value>Ya, Hapus Data</value>
   </data>

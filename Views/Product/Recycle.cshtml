@@ -8,10 +8,11 @@
 @await Component.InvokeAsync(
     "PageHeader", 
     new { 
-        PageTitle = "Produk Manajemen", 
+        PageTitle = "Produk Manajemen | Data Terhapus", 
         breadcrumb = new List<(string, string, string)>
         {
             ("Home", "Index", "Home"),
+            ("Produk", "Index", "Product"),
             ("Produk", "", "")
         }
     }
@@ -20,26 +21,24 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <card-layout title="Daftar Produk" button-create-link="Product/Create" button-recycle-link="Product/Recycle" button-multiple-delete="true">
+                <card-layout title="Daftar Produk Terhapus">
                     @await Html.PartialAsync("Components/_TableOuter", new HtmlString(@"
                         <thead>
                             <tr>
-                                <th width='5%'><input type='checkbox' id='checkAll'></th>
                                 <th width='15%'>Nama</th>
                                 <th width='5%'>Harga</th>
-                                <th width='10%'>Created At</th>
                                 <th width='10%'>Updated At</th>
+                                <th width='10%'>Deleted At</th>
                                 <th width='10%'>Actions</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
                         <tfoot>
                             <tr>
-                                <th></th>
                                 <th><input type='text' class='form-control' placeholder='Search Name' /></th>
                                 <th><input type='text' class='form-control' placeholder='Search Price' /></th>
-                                <th><input type='text' class='form-control' placeholder='Search Created At' /></th>
                                 <th><input type='text' class='form-control' placeholder='Search Updated At' /></th>
+                                <th><input type='text' class='form-control' placeholder='Search Deleted At' /></th>
                                 <th></th>
                             </tr>
                         </tfoot>"), new ViewDataDictionary(ViewData) { { "TableId", "product" } })
@@ -51,9 +50,6 @@
 
 @await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data ?</p>
 		<p id='content'></p>"), new ViewDataDictionary(ViewData) { { "ModalId", "modal-delete" }, { "FormId", "formHapus" } })
-
-@await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data yang terpilih ?</p>
-		<input type='hidden' name='datahapus' id='datahapus' value=''>"), new ViewDataDictionary(ViewData) { { "ModalId", "modal-multidelete" }, { "FormId", "formHapusMulti" } })
 
 @section Styles {
 @{await Html.RenderPartialAsync("_DatatableStylesPartial");}
@@ -67,9 +63,6 @@
 <script type="text/template" id="tpl-button-dropdown">
     @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
 </script>
-<script type="text/template" id="tpl-button-edit">
-    @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
-</script>
 <script type="text/template" id="tpl-button-delete">
     @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, {"DataTitle", "__DATATITLE__"} })
 </script>
@@ -78,15 +71,7 @@
 </script>
 <script>
     $(async function () {
-        let columns = [{
-                data: 'id',
-                orderable: false,
-            searchable: false,
-            render: function(data, type, row, meta) {
-                let check = `<input name='idpilih[]' type="checkbox" id="checkItem" value="${row.id}">`;
-                return check;
-            }
-        },
+        let columns = [
         {
             data: 'name',
             render: function(data, type, row, meta) {
@@ -100,15 +85,15 @@
             }
         },
         {
-            data: 'createdAt',
-            render: function(data, type, row, meta) {
-                return `${formatDateTimeYMDHIS(row.createdAt)}`;
-            }
-        },
-        {
             data: 'updatedAt',
             render: function(data, type, row, meta) {
                 return `${formatDateTimeYMDHIS(row.updatedAt)}`;
+            }
+        },
+        {
+            data: 'deletedAt',
+            render: function(data, type, row, meta) {
+                return `${formatDateTimeYMDHIS(row.deletedAt)}`;
             }
         },
         {
@@ -118,19 +103,16 @@
             render: function(data, type, row, meta) {
                 let id = row.id;
                 let title = row.name;
-
-                let tpl = $("#tpl-button-edit").html();
-                tpl = tpl.replace("__LINK__", `/product/edit/${id}`);
                 
                 let tplDelete = $("#tpl-button-delete").html();
                 tplDelete = tplDelete.replace("__DATAID__", id);
                 tplDelete = tplDelete.replace("__DATATITLE__", title);
 
                 let tplDropdown = $("#tpl-button-dropdown").html()
-                tplDropdown = tplDropdown.replace("__BTN__", tpl + tplDelete)
+                tplDropdown = tplDropdown.replace("__BTN__", tplDelete)
                 
                 let html = '';
-                html += tplDropdown;
+                @* html += tplDropdown; *@
                 return html;
             }
         }
@@ -160,15 +142,10 @@
             }
         };
 
-        let dtURL = "@Url.Action("GetData", "Product")";
+        let dtURL = "@Url.Action("GetDataDeleted", "Product")";
         let deleteDataUrl = `/product/delete/:id`;
         
         const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 3, 'product')
-    });
-
-    $("#btn-delete-multi").on("click", function () {
-        let multiDeleteDataUrl = `/product/multi-delete`;
-        hapusmulti(multiDeleteDataUrl);
     });
 
     $("#formHapusMulti").submit(function (e) {

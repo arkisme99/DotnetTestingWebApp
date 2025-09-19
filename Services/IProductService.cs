@@ -10,6 +10,7 @@ namespace DotnetTestingWebApp.Services
     {
         Task<List<Product>> GetProductsAsync();
         IQueryable<Product> GetAll();
+        IQueryable<Product> GetAllDeleted();
         Task<Product> StoreAsync(Product product);
         Task<Product> GetByIdAsync(Guid id);
         Task<Product> UpdateAsync(Product product);

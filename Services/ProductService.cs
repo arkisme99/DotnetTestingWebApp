@@ -23,6 +23,11 @@ namespace DotnetTestingWebApp.Services
             return _context.Products.AsQueryable();
         }
 
+        public IQueryable<Product> GetAllDeleted()
+        {
+            return _context.Products.IgnoreQueryFilters().Where(p => p.IsDeleted).AsQueryable();
+        }
+
         public async Task<Product> StoreAsync(Product product)
         {
             _context.Products.Add(product);

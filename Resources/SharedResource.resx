@@ -18,6 +18,9 @@
   <data name="HapusBanyak">
     <value>Delete Selected Data</value>
   </data>
+  <data name="RecycleData">
+    <value>Data Recycle</value>
+  </data>
   <data name="Login">
     <value>Sign In</value>
   </data>

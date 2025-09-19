@@ -14,6 +14,7 @@ namespace DotnetTestingWebApp.TagHelpers
     {
         public string Title { get; set; } = string.Empty;
         public string? ButtonCreateLink { get; set; }
+        public string? ButtonRecycleLink { get; set; }
         public Boolean ButtonMultipleDelete { get; set; } = false;
         private readonly IHtmlHelper _htmlHelper = htmlHelper;
 
@@ -51,6 +52,23 @@ namespace DotnetTestingWebApp.TagHelpers
                     "Components/_ButtonCreate", viewData
                 );
                 output.Content.AppendHtml(buttonCreate);
+            }
+            //component button recycle
+            if (!string.IsNullOrEmpty(ButtonRecycleLink))
+            {
+                var parts = ButtonRecycleLink.Split('/');
+                string controller = parts.Length > 0 ? parts[0] : "";
+                string action = parts.Length > 1 ? parts[1] : "";
+                var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    { "LinkController", controller },
+                    { "LinkAction", action }
+                };
+
+                var buttonRecycle = await _htmlHelper.PartialAsync(
+                    "Components/_ButtonRecycle", viewData
+                );
+                output.Content.AppendHtml(buttonRecycle);
             }
             // tombol delete multi
             if (ButtonMultipleDelete == true)

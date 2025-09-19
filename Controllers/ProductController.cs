@@ -112,6 +112,12 @@ namespace DotnetTestingWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HasPermission("DeleteProduct")]
+        public IActionResult Recycle()
+        {
+            return View();
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {
@@ -127,6 +133,37 @@ namespace DotnetTestingWebApp.Controllers
             };
 
             var query = _service.GetAll()
+                                .ApplyDataTableRequest(req, columnMap);
+
+            // var sqlnya = query.ToQueryString();
+            var recordsTotal = query.Count();
+            var data = query.Skip(req.Start).Take(req.Length).ToList();
+
+            return Json(new DataTableResponse<Product>
+            {
+                Draw = req.Draw,
+                RecordsFiltered = recordsTotal,
+                RecordsTotal = recordsTotal,
+                // QueryString = sqlnya,
+                Data = data,
+            });
+        }
+
+        [HttpPost]
+        public IActionResult GetDataDeleted()
+        {
+
+            var req = DataTableHelper.GetDataTableRequest(Request);
+
+            var columnMap = new Dictionary<string, Expression<Func<Product, object>>>
+            {
+                ["name"] = p => p.Name,
+                ["price"] = p => p.Price!,
+                ["deletedAt"] = p => p.DeletedAt!,
+                ["updatedAt"] = p => p.UpdatedAt!
+            };
+
+            var query = _service.GetAllDeleted()
                                 .ApplyDataTableRequest(req, columnMap);
 
             // var sqlnya = query.ToQueryString();
