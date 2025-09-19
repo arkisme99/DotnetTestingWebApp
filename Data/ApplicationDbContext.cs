@@ -20,6 +20,7 @@ namespace DotnetTestingWebApp.Data
         public override int SaveChanges()
         {
             ApplyAuditInfo();
+            ApplySoftDeleted();
             return base.SaveChanges();
         }
 
@@ -28,7 +29,20 @@ namespace DotnetTestingWebApp.Data
         CancellationToken cancellationToken = default)
         {
             ApplyAuditInfo();
+            ApplySoftDeleted();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void ApplySoftDeleted()
+        {
+            foreach (var entry in ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted))
+            {
+                // ubah dari "Delete" ke "Update" dengan IsDeleted = true
+                entry.State = EntityState.Modified;
+                entry.CurrentValues["IsDeleted"] = true;
+                entry.CurrentValues["DeletedAt"] = DateTime.UtcNow;
+            }
         }
 
         private void ApplyAuditInfo()
@@ -71,6 +85,8 @@ namespace DotnetTestingWebApp.Data
                 .HasOne(rp => rp.Permission)
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId);
+
+            builder.Entity<Product>().HasQueryFilter(p => !p.IsDeleted);
         }
     }
 }
