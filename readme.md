@@ -9,7 +9,7 @@
 - Dark Mode Admin Lte
 - Implementasi DataTable Server Side
 - Role Management
-- User Management
+- User Management + Multi Role
 
 #Set database on development
 

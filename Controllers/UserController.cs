@@ -123,6 +123,37 @@ namespace DotnetTestingWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        //POST : Role/Delete
+        [HasPermission("MultiDeleteUser")]
+        [HttpPost, ActionName("multi-delete")]
+        public async Task<IActionResult> MultiDelete(string datahapus)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(datahapus))
+                    return BadRequest("Tidak ada data untuk dihapus.");
+
+                var deletedCount = await _service.DeleteMultisAsync(datahapus);
+
+                if (deletedCount > 0)
+                {
+                    TempData["TypeMessage"] = "success";
+                    TempData["ValueMessage"] = $"{deletedCount} Data {localizer["PesanHapusSukses"].Value}";
+                }
+                else
+                {
+                    TempData["TypeMessage"] = "warning";
+                    TempData["ValueMessage"] = localizer["PesanHapusBatal"].Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["TypeMessage"] = "error";
+                TempData["ValueMessage"] = ex.Message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {

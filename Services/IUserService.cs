@@ -15,5 +15,6 @@ namespace DotnetTestingWebApp.Services
         Task<ApplicationUser> StoreAsync(UserCreateDto dto);
         Task<ApplicationUser> UpdateAsync(string userId, UserCreateDto dto);
         Task DeleteAsync(string id);
+        Task<int> DeleteMultisAsync(string ids);
     }
 }

@@ -1,5 +1,8 @@
 @using Microsoft.AspNetCore.Html
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.Extensions.Localization
+@using System.Security.Claims
+@inject UserManager<ApplicationUser> UserManager
 @inject IStringLocalizer<SharedResource> Localizer
 
 @{
@@ -75,25 +78,31 @@ name='datahapus' id='datahapus' value=''> ");
     }
     <script src="~/helpers/js/multi-delete.js"></script>
     <script type="text/template" id="tpl-button-dropdown">
-                                                            @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
-                                                        </script>
+                                                                                @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
+                                                                            </script>
     <script type="text/template" id="tpl-button-edit">
-                                                            @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
-                                                        </script>
+                                                                                @await Html.PartialAsync("Components/_ButtonEdit", new ViewDataDictionary(ViewData) { { "LinkPath", "__LINK__" } })
+                                                                            </script>
     <script type="text/template" id="tpl-button-delete">
-                                                            @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
-                                                        </script>
+                                                                                @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
+                                                                            </script>
     <script type="text/template" id="tpl-loading-icon">
-                                                            @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
-                                                        </script>
+                                                                                @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, { "DataTitle", "__DATATITLE__" } })
+                                                                            </script>
     <script>
         $(async function () {
+
+            const currentUserId = "@User.FindFirst(ClaimTypes.NameIdentifier)?.Value";
+
             let columns = [{
                 data: 'id',
                 orderable: false,
                 searchable: false,
                 render: function (data, type, row, meta) {
                     let check = `<input name='idpilih[]' type="checkbox" id="checkItem" value="${row.id}">`;
+                    if (row.id === currentUserId) {
+                        check = "";
+                    }
                     return check;
                 }
             },
@@ -137,6 +146,10 @@ name='datahapus' id='datahapus' value=''> ");
                     let tplDelete = $("#tpl-button-delete").html();
                     tplDelete = tplDelete.replace("__DATAID__", id);
                     tplDelete = tplDelete.replace("__DATATITLE__", title);
+
+                    if (row.id === currentUserId) {
+                        tplDelete = "";
+                    }
 
                     let tplDropdown = $("#tpl-button-dropdown").html()
                     tplDropdown = tplDropdown.replace("__BTN__", tpl + tplDelete)

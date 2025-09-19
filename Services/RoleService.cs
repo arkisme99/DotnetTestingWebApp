@@ -205,7 +205,6 @@ namespace DotnetTestingWebApp.Services
 
                 foreach (var id in idList)
                 {
-                    Console.WriteLine("Masuk Sini : " + id);
                     // cek role ada ga
                     var role = await _context.ApplicationRoles.FirstOrDefaultAsync(r => r.Id == id) ?? throw new Exception("Role not found");
 
