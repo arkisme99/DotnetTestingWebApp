@@ -10,6 +10,7 @@
 - Implementasi DataTable Server Side
 - Role Management
 - User Management + Multi Role
+- Implementasi Job Using Hangfire
 
 #Set database on development
 

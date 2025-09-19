@@ -6,6 +6,7 @@ using System.Resources;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Middlewares;
 using DotnetTestingWebApp.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ using Microsoft.Extensions.Localization;
 namespace DotnetTestingWebApp.Controllers
 {
     [Authorize]
-    public class HomeController(IEmailService emailService) : Controller
+    public class HomeController(IBackgroundJobClient _jobs) : Controller
     {
 
 
@@ -34,9 +35,16 @@ namespace DotnetTestingWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> TestEmail()
+        public IActionResult TestEmail()
         {
-            await emailService.SendEmailAsync(0, "penerima@email.com", "Tes Kirim", "Berhasil guys");
+
+            _jobs.Enqueue<EmailService>(svc => svc.SendEmailAsync(
+                                            0,
+                                            "penerima@email.com",
+                                            "Tes Kirim",
+                                            "Berhasil guys"
+                                        ));
+
 
             TempData["TypeMessage"] = "success";
             TempData["ValueMessage"] = "Tes Kirim Harusnya Berhasil";

@@ -13,6 +13,7 @@ namespace DotnetTestingWebApp.Services
         {
             /* var sender = await _db.EmailSenders.FindAsync(senderId);
             if (sender == null) throw new Exception("Sender tidak ditemukan"); */
+
             var sender = "test@email.com";
             var username = "4df6bdb48d7e0e";
             var senderPassword = "c9cd90c86fee8f";

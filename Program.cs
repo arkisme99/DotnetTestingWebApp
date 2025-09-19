@@ -4,6 +4,8 @@ using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Seeders;
 using DotnetTestingWebApp.Services;
+using Hangfire;
+using Hangfire.MySql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -17,6 +19,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(
     builder.Configuration.GetConnectionString("DefaultConnection"),
     ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
 ));
+
+// 🔹 Tambahkan Hangfire + MySQL Storage
+builder.Services.AddHangfire(config =>
+    config.UseStorage(
+        new MySqlStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new MySqlStorageOptions
+        {
+            TablesPrefix = "Hangfire_", // prefix table
+        })
+    )
+);
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
@@ -65,6 +77,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
+builder.Services.AddHangfireServer();
 // Add services to the container.
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -113,6 +126,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     // options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
 });
 
+builder.WebHost.UseUrls("http://localhost:5000");
 
 var app = builder.Build();
 
@@ -134,6 +148,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseHangfireDashboard("/hangfire-panel");
 
 // app.UseRequestLocalization(localizationOptions);
 

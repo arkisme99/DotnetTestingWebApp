@@ -6,6 +6,8 @@
     <UserSecretsId>996b7b21-1f0d-409e-977c-f23fbd0daeb9</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.8.21" />
+    <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
     <PackageReference Include="MailKit" Version="4.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
