@@ -15,7 +15,7 @@
                 <div class="modal-footer">
                     @await Html.PartialAsync("Components/_ButtonCancel")
                     @await Html.PartialAsync("Components/_SubmitPrimary", new ViewDataDictionary(ViewData) { { "Id",
-                    "btnSubmit" }, { "Label", "Ya, Restore" } })
+                    "btnSubmit" }, { "Label", "Ya, Restore" }, { "ClassNew", "delete" } })
                 </div>
             </form>
         </div>

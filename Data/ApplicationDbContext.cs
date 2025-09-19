@@ -17,22 +17,25 @@ namespace DotnetTestingWebApp.Data
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ApplicationRolePermission> RolePermissions { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
 
-        public override int SaveChanges()
+        /* public override int SaveChanges()
         {
-            ApplyAuditInfo();
+            // ApplyAuditInfo();
+            Console.WriteLine("CekInterceptors_HarusnyaSesudah");
             ApplySoftDeleted();
             return base.SaveChanges();
-        }
+        } */
 
-        public override Task<int> SaveChangesAsync(
+        /* public override Task<int> SaveChangesAsync(
         bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = default)
         {
-            ApplyAuditInfo();
+            // ApplyAuditInfo();
+            Console.WriteLine("CekInterceptors_HarusnyaSesudah");
             ApplySoftDeleted();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
-        }
+        } */
 
         private void ApplySoftDeleted()
         {
