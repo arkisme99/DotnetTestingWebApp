@@ -155,5 +155,37 @@ namespace DotnetTestingWebApp.Services
             }
         }
 
+        public async Task DeleteAsync(string id)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var user = await userManager.FindByIdAsync(id) ?? throw new Exception("User not found");
+
+                // 1. Hapus semua role user
+                var roles = await userManager.GetRolesAsync(user);
+                if (roles.Any())
+                {
+                    var removeRoleResult = await userManager.RemoveFromRolesAsync(user, roles);
+                    if (!removeRoleResult.Succeeded)
+                    {
+                        throw new Exception("Failed to clear roles on user");
+                    }
+                }
+
+                // 2. Hapus user
+                await userManager.DeleteAsync(user);
+                // Commit transaction
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+
+
+        }
+
     }
 }
