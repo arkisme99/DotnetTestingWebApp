@@ -11,6 +11,7 @@
 - Role Management
 - User Management + Multi Role
 - Implementasi Job Using Hangfire
+- Implementasi Activity Log (Manual & Otomatis)
 
 #Set database on development
 
