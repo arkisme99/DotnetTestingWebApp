@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
 {
-    public class AuthService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager, ILogger<AuthService> logger) : IAuthService
+    public class AuthService(ApplicationDbContext context, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager, ILogger<AuthService> logger, IActivityLogService _activityLogService, IHttpContextAccessor _httpContextAccessor) : IAuthService
     {
         /* private readonly ApplicationDbContext _context = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -64,12 +64,15 @@ namespace DotnetTestingWebApp.Services
             );
 
             logger.LogInformation("Proses Login {email}, {roles}, {permissions}", email, roles, permissions);
+            await _activityLogService.LogChangeAsync(null, "Login", user.Id, null, null);
 
             return true;
         }
 
         public async Task LogoutAsync()
         {
+            var userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+            await _activityLogService.LogChangeAsync(null, "Logout", userId, null, null);
             await signInManager.SignOutAsync();
         }
 

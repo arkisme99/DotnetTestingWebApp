@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Data;
@@ -88,6 +89,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
 
 // Routing lowercase
 builder.Services.AddRouting(options =>

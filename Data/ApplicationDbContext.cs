@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Models;
+using DotnetTestingWebApp.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -36,7 +37,6 @@ namespace DotnetTestingWebApp.Data
         CancellationToken cancellationToken = default)
         {
             // ApplyAuditInfo();
-            Console.WriteLine("CekInterceptors_HarusnyaSesudah");
             // ApplySoftDeleted();
             LogChanges();
             return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
@@ -105,6 +105,8 @@ namespace DotnetTestingWebApp.Data
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 });
+                /* _activityLogService.LogChangeAsync(entry.Entity.GetType().Name, stringAction, user, GetPrimaryKey(entry), changes); */
+
             }
 
             // Tambahkan setelah looping selesai → aman
@@ -119,42 +121,6 @@ namespace DotnetTestingWebApp.Data
             // ArgumentNullException.ThrowIfNull(entry);
             var key = entry.Properties.FirstOrDefault(p => p.Metadata.IsPrimaryKey());
             return key?.CurrentValue?.ToString() ?? "";
-        }
-
-        private void ApplySoftDeleted()
-        {
-            foreach (var entry in ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Deleted))
-            {
-                // ubah dari "Delete" ke "Update" dengan IsDeleted = true
-                entry.State = EntityState.Modified;
-                entry.CurrentValues["IsDeleted"] = true;
-                entry.CurrentValues["DeletedAt"] = DateTime.UtcNow;
-            }
-        }
-
-        private void ApplyAuditInfo()
-        {
-            var entries = ChangeTracker
-                .Entries()
-                .Where(e => e.Entity is AuditableEntity &&
-                            (e.State == EntityState.Added || e.State == EntityState.Modified));
-
-            foreach (var entityEntry in entries)
-            {
-                var entity = (AuditableEntity)entityEntry.Entity;
-
-                if (entityEntry.State == EntityState.Added)
-                {
-                    entity.CreatedAt = DateTime.Now;
-                }
-                else
-                {
-                    entityEntry.Property(nameof(AuditableEntity.CreatedAt)).IsModified = false;
-                }
-
-                entity.UpdatedAt = DateTime.Now;
-            }
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
