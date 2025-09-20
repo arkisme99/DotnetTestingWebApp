@@ -21,7 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
-    options.AddInterceptors(new ActivityLogInterceptor(new HttpContextAccessor()));
+    // options.AddInterceptors(new ActivityLogInterceptor(new HttpContextAccessor()));
 });
 
 // 🔹 Tambahkan Hangfire + MySQL Storage

@@ -18,17 +18,39 @@ namespace DotnetTestingWebApp.Data
             DbContextEventData eventData,
             InterceptionResult<int> result)
         {
-            LogChanges(eventData.Context!);
+            // LogChanges(eventData.Context!);
+            Console.WriteLine("SavingChanges");
             return base.SavingChanges(eventData, result);
         }
+
+        public override int SavedChanges(
+            SaveChangesCompletedEventData eventData,
+            int result)
+        {
+            // ini AFTER commit sukses
+            Console.WriteLine("SavedChanges");
+            return base.SavedChanges(eventData, result);
+        }
+
 
         public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
             DbContextEventData eventData,
             InterceptionResult<int> result,
             CancellationToken cancellationToken = default)
         {
-            LogChanges(eventData.Context!);
+            // LogChanges(eventData.Context!);
+            Console.WriteLine("SavingChangesAsync");
             return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+
+        public override ValueTask<int> SavedChangesAsync(
+            SaveChangesCompletedEventData eventData,
+            int result,
+            CancellationToken cancellationToken = default)
+        {
+            // ini AFTER commit sukses
+            Console.WriteLine("SavedChanges");
+            return base.SavedChangesAsync(eventData, result, cancellationToken);
         }
 
         private void LogChanges(DbContext context)
@@ -47,7 +69,7 @@ namespace DotnetTestingWebApp.Data
 
                 var changes = entry.State switch
                 {
-                    EntityState.Added => entry.CurrentValues.ToObject(),
+                    EntityState.Added => entry.CurrentValues.ToObject() ?? "data",
                     EntityState.Modified => entry.Properties
                         .Where(p => p.IsModified && p.Metadata.Name != nameof(AuditableEntity.UpdatedAt))
                         .ToDictionary(p => p.Metadata.Name, p => new { Original = p.OriginalValue, Current = p.CurrentValue }),
@@ -92,30 +114,9 @@ namespace DotnetTestingWebApp.Data
 
         private static string GetPrimaryKey(EntityEntry entry)
         {
-            ArgumentNullException.ThrowIfNull(entry);
+            // ArgumentNullException.ThrowIfNull(entry);
             var key = entry.Properties.FirstOrDefault(p => p.Metadata.IsPrimaryKey());
             return key?.CurrentValue?.ToString() ?? "";
         }
-
-        private static string GetChanges(EntityEntry entry)
-        {
-            if (entry.State == EntityState.Modified)
-            {
-                var changes = entry.Properties
-                    .Where(p => p.IsModified)
-                    .ToDictionary(p => p.Metadata.Name, p => new { Original = p.OriginalValue, Current = p.CurrentValue });
-                return JsonSerializer.Serialize(changes);
-            }
-            else if (entry.State == EntityState.Added)
-            {
-                return JsonSerializer.Serialize(entry.CurrentValues.ToObject());
-            }
-            else if (entry.State == EntityState.Deleted)
-            {
-                return JsonSerializer.Serialize(entry.OriginalValues.ToObject());
-            }
-            return null!;
-        }
-
     }
 }
