@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
@@ -10,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
 {
-    public class UserService(ApplicationDbContext _context, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager) : IUserService
+    public class UserService(ApplicationDbContext _context, UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IActivityLogService _activityLogService, IHttpContextAccessor _httpContextAccessor) : IUserService
     {
         public IQueryable<UserListDto> GetAll()
         {
@@ -94,7 +95,24 @@ namespace DotnetTestingWebApp.Services
 
                 var result = await userManager.CreateAsync(user, adminPassword!);
 
-                Console.WriteLine($"CekHasil : {result} , User : {user}");
+                if (result.Succeeded)
+                {
+                    /* Console.WriteLine($"User berhasil dibuat:");
+                    Console.WriteLine($"Id       : {user.Id}");
+                    Console.WriteLine($"Username : {user.UserName}");
+                    Console.WriteLine($"FullName : {user.FullName}");
+                    Console.WriteLine($"Email    : {user.Email}"); */
+                    //log manual
+                    var objData = new
+                    {
+                        Id = user.Id,
+                        Username = user.UserName,
+                        FullName = user.FullName,
+                        Email = user.Email
+                    };
+                    var userEntry = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+                    await _activityLogService.LogChangeAsync("ApplicationUser", "Added", userEntry, user.Id, objData);
+                }
 
                 if (dto.Roles != null && dto.Roles.Count > 0)
                 {
@@ -104,7 +122,6 @@ namespace DotnetTestingWebApp.Services
                         await userManager.AddToRoleAsync(user, roleEntity.Name!);
                     }
                 }
-
 
                 // Commit transaction
                 await transaction.CommitAsync();
@@ -128,12 +145,39 @@ namespace DotnetTestingWebApp.Services
                 var user = await userManager.FindByIdAsync(userId.ToString());
                 if (user != null)
                 {
+                    var objDataOld = new
+                    {
+                        Id = user.Id,
+                        Username = user.UserName,
+                        FullName = user.FullName,
+                        Email = user.Email
+                    };
                     // update username & email
                     user.UserName = dto.UserName;
                     user.FullName = dto.Fullname;
                     user.Email = dto.Email ?? dto.UserName;
 
                     var updateResult = await userManager.UpdateAsync(user);
+
+                    if (updateResult.Succeeded)
+                    {
+                        //log manual
+                        var objDataNew = new
+                        {
+                            Id = user.Id,
+                            Username = user.UserName,
+                            FullName = user.FullName,
+                            Email = user.Email
+                        };
+
+                        var objData = new
+                        {
+                            Original = objDataOld,
+                            Current = objDataNew
+                        };
+                        var userEntry = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+                        await _activityLogService.LogChangeAsync("ApplicationUser", "Modified", userEntry, user.Id, objData);
+                    }
 
                     // update password jika ada
                     if (!string.IsNullOrWhiteSpace(dto.Password))
@@ -175,15 +219,76 @@ namespace DotnetTestingWebApp.Services
 
         public async Task<IdentityResult> SoftDeleteUserAsync(ApplicationUser user)
         {
+            var objDataOld = new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FullName = user.FullName,
+                Email = user.Email,
+                IsDeleted = user.IsDeleted,
+                DeletedAt = user.DeletedAt
+            };
+
             user.IsDeleted = true;
-            user.DeletedAt = DateTime.UtcNow;
+            user.DeletedAt = DateTime.Now;
+
+            var objDataNew = new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FullName = user.FullName,
+                Email = user.Email,
+                IsDeleted = true,
+                DeletedAt = DateTime.Now
+            };
+
+            var objData = new
+            {
+                Original = objDataOld,
+                Current = objDataNew
+            };
+
+            var userEntry = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+            await _activityLogService.LogChangeAsync("ApplicationUser", "SoftDeleted", userEntry, user.Id, objData);
             return await userManager.UpdateAsync(user);
         }
 
         public async Task<IdentityResult> SoftRestoreUserAsync(ApplicationUser user)
         {
+
+            var objDataOld = new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FullName = user.FullName,
+                Email = user.Email,
+                IsDeleted = user.IsDeleted,
+                DeletedAt = user.DeletedAt
+            };
+
+
             user.IsDeleted = false;
             user.DeletedAt = null;
+
+            var objDataNew = new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FullName = user.FullName,
+                Email = user.Email,
+                IsDeleted = false,
+                DeletedAt = ""
+            };
+
+            var objData = new
+            {
+                Original = objDataOld,
+                Current = objDataNew
+            };
+
+            var userEntry = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+            await _activityLogService.LogChangeAsync("ApplicationUser", "Modified", userEntry, user.Id, objData);
+
             return await userManager.UpdateAsync(user);
         }
 
