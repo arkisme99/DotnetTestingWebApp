@@ -48,7 +48,7 @@
     </div>
 </div>
 
-@await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data ?</p>
+@await Html.PartialAsync("Components/_ModalRestore", new HtmlString(@"<p>Anda yakin ingin restore data ?</p>
 		<p id='content'></p>"), new ViewDataDictionary(ViewData) { { "ModalId", "modal-delete" }, { "FormId", "formHapus" } })
 
 @section Styles {
@@ -63,8 +63,8 @@
 <script type="text/template" id="tpl-button-dropdown">
     @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
 </script>
-<script type="text/template" id="tpl-button-delete">
-    @await Html.PartialAsync("Components/_ButtonDelete", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, {"DataTitle", "__DATATITLE__"} })
+<script type="text/template" id="tpl-button-restore">
+    @await Html.PartialAsync("Components/_ButtonRestore", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, {"DataTitle", "__DATATITLE__"} })
 </script>
 <script type="text/template" id="tpl-loading-icon">
     @await Html.PartialAsync("Components/_LoadingIcon", new ViewDataDictionary(ViewData) { { "DataId", "__DATAID__" }, {"DataTitle", "__DATATITLE__"} })
@@ -104,15 +104,15 @@
                 let id = row.id;
                 let title = row.name;
                 
-                let tplDelete = $("#tpl-button-delete").html();
-                tplDelete = tplDelete.replace("__DATAID__", id);
-                tplDelete = tplDelete.replace("__DATATITLE__", title);
+                let tplRestore = $("#tpl-button-restore").html();
+                    tplRestore = tplRestore.replace("__DATAID__", id);
+                    tplRestore = tplRestore.replace("__DATATITLE__", title);
 
                 let tplDropdown = $("#tpl-button-dropdown").html()
-                tplDropdown = tplDropdown.replace("__BTN__", tplDelete)
+                tplDropdown = tplDropdown.replace("__BTN__", tplRestore)
                 
                 let html = '';
-                @* html += tplDropdown; *@
+                html += tplDropdown;
                 return html;
             }
         }
@@ -143,15 +143,9 @@
         };
 
         let dtURL = "@Url.Action("GetDataDeleted", "Product")";
-        let deleteDataUrl = `/product/delete/:id`;
+        let deleteDataUrl = `/product/restore/:id`;
         
         const dt = await dataTableRender(dtURL, columns, options, "POST", deleteDataUrl, 3, 'product')
-    });
-
-    $("#formHapusMulti").submit(function (e) {
-        let tpl = $("#tpl-loading-icon").html();
-        $(".delete").html(tpl);
-        $(".delete").prop("disabled", true);
     });
 </script>
 }

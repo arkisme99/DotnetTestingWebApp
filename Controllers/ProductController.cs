@@ -118,6 +118,24 @@ namespace DotnetTestingWebApp.Controllers
             return View();
         }
 
+        [HasPermission("DeleteProduct")]
+        [HttpPost, ActionName("Restore")]
+        public async Task<IActionResult> Restore(Guid id)
+        {
+            try
+            {
+                await _service.RestoreAsync(id);
+                TempData["TypeMessage"] = "success";
+                TempData["ValueMessage"] = "Proses Restore Sukses";
+            }
+            catch (Exception ex)
+            {
+                TempData["TypeMessage"] = "warning";
+                TempData["ValueMessage"] = ex.Message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         public IActionResult GetData()
         {

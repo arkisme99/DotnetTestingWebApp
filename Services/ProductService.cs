@@ -89,5 +89,27 @@ namespace DotnetTestingWebApp.Services
 
             return deletedCount;
         }
+
+        public async Task RestoreAsync(Guid id)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var product = await _context.Products.IgnoreQueryFilters().FirstAsync(u => u.Id == id) ?? throw new Exception("Product not found");
+
+                product.IsDeleted = false;
+                product.DeletedAt = null;
+
+                _context.Products.Update(product);
+                await _context.SaveChangesAsync();
+                // Commit transaction
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
     }
 }
