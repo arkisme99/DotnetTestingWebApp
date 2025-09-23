@@ -5,12 +5,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using DotnetTestingWebApp.Data;
+using DotnetTestingWebApp.Hubs;
 using DotnetTestingWebApp.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
 {
-    public class ProductService(ApplicationDbContext context) : IProductService
+    public class ProductService(ApplicationDbContext context, IHubContext<NotificationHub> _hub) : IProductService
     {
         private readonly ApplicationDbContext _context = context;
 
@@ -146,12 +148,26 @@ namespace DotnetTestingWebApp.Services
         }
 
         // Export Excel
-        public async Task ExportExcelJob(string outputPath)
+        public async Task ExportExcelJob(string fileName)
         {
+            var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "exports");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            var outputPath = Path.Combine(folder, fileName);
             var stream = await ExportExcelAsync();
             using var fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(fileStream);
-            Console.WriteLine("Excel Exported via Hangfire Job!");
+
+            // Kirim notifikasi ke semua user
+            var fileUrl = $"/exports/{fileName}";
+            await _hub.Clients.All.SendAsync("ReceiveNotification", new
+            {
+                Message = "Export Product selesai, klik untuk download",
+                FileUrl = fileUrl,
+                Icon = "fas fa-file-excel",
+                Time = DateTime.Now.ToString("HH:mm")
+            });
         }
     }
 }

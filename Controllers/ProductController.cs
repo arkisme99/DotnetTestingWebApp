@@ -206,21 +206,11 @@ namespace DotnetTestingWebApp.Controllers
         {
             // var stream = await _service.ExportExcelAsync();
             var fileName = $"Data-Product-{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx";
-
-            var downloadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "exports");
-            if (!Directory.Exists(downloadFolder))
-            {
-                Directory.CreateDirectory(downloadFolder);
-            }
-
-            var outputPath = Path.Combine(downloadFolder, fileName);
-
             // Enqueue job
-            _jobs.Enqueue(() => _service.ExportExcelJob(outputPath));
-
+            _jobs.Enqueue(() => _service.ExportExcelJob(fileName));
 
             TempData["TypeMessage"] = "success";
-            TempData["ValueMessage"] = $"Proses Export Data Di Background, Lokasi File Di sini : {outputPath}";
+            TempData["ValueMessage"] = $"Proses Export Data Di Background, link download akan tampil di notifikasi";
 
             return RedirectToAction(nameof(Index));
 

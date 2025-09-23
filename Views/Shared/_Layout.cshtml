@@ -109,6 +109,32 @@
             notificationMessages(type, message);
         }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/notification")
+            .build();
+
+        connection.on("ReceiveNotification", function (data) {
+            @* console.log(`Data Notif ${JSON.stringify(data)}`); *@
+                let count = parseInt($(".notification-count").text() || "0", 10);
+            $(".notification-count").text(count + 1);
+
+            let list = document.getElementById("notification-list");
+
+            let itemData = `<a href="${data.fileUrl}" class="dropdown-item text-wrap">
+                <i class="${data.icon} mr-2"></i> ${data.message}
+                <span class="float-right text-muted text-sm">${data.time}</span>
+            </a>`;
+
+            $("#notification-list").append(itemData)
+            @*  let li = document.createElement("li");
+            li.innerHTML = `${data.Message} - <a href="${data.FileUrl}" download>Download</a>`;
+            list.prepend(li); *@
+        });
+
+        connection.start();
+    </script>
 
 </body>
 
