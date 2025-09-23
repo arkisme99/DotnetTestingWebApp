@@ -12,6 +12,8 @@
 - User Management + Multi Role
 - Implementasi Job Using Hangfire
 - Implementasi Activity Log (Manual & Otomatis)
+- Implementasi Export Excel
+- Implementasi notification pakai signal
 
 #Set database on development
 

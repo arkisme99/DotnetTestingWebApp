@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Data;
+using DotnetTestingWebApp.Hubs;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Seeders;
 using DotnetTestingWebApp.Services;
@@ -132,6 +133,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     // options.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
 });
 
+builder.Services.AddSignalR();
+
 builder.WebHost.UseUrls("http://localhost:5000");
 
 var app = builder.Build();
@@ -167,6 +170,8 @@ app.UseRequestLocalization(locOptions.Value);
 
 app.UseRouting();
 app.UseAuthentication();
+
+app.MapHub<NotificationHub>("/hubs/notification");
 
 // 🔹 Custom Middleware: redirect kalau sudah login akses /Login
 app.Use(async (context, next) =>
