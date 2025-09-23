@@ -15,6 +15,7 @@ namespace DotnetTestingWebApp.TagHelpers
         public string Title { get; set; } = string.Empty;
         public string? ButtonCreateLink { get; set; }
         public string? ButtonRecycleLink { get; set; }
+        public string? ButtonExportExcel { get; set; }
         public Boolean ButtonMultipleDelete { get; set; } = false;
         private readonly IHtmlHelper _htmlHelper = htmlHelper;
 
@@ -36,6 +37,24 @@ namespace DotnetTestingWebApp.TagHelpers
             output.Content.AppendHtml("<div class='card-header'>");
             output.Content.AppendHtml($"<h3 class='card-title'>{Title}</h3>");
             output.Content.AppendHtml("<div class='card-tools'>");
+
+            //component button recycle
+            if (!string.IsNullOrEmpty(ButtonExportExcel))
+            {
+                var parts = ButtonExportExcel.Split('/');
+                string controller = parts.Length > 0 ? parts[0] : "";
+                string action = parts.Length > 1 ? parts[1] : "";
+                var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                {
+                    { "LinkController", controller },
+                    { "LinkAction", action }
+                };
+
+                var buttonRecycle = await _htmlHelper.PartialAsync(
+                    "Components/_ButtonExport", viewData
+                );
+                output.Content.AppendHtml(buttonRecycle);
+            }
 
             if (!string.IsNullOrEmpty(ButtonCreateLink))
             {

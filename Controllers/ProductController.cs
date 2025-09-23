@@ -8,6 +8,7 @@ using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Helpers;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
+using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ using Microsoft.Extensions.Localization;
 namespace DotnetTestingWebApp.Controllers
 {
     [Authorize]
-    public class ProductController(IProductService _service, IStringLocalizer<SharedResource> localizer) : Controller
+    public class ProductController(IProductService _service, IStringLocalizer<SharedResource> localizer, IBackgroundJobClient _jobs) : Controller
     {
 
         [HasPermission("ViewProduct")]
@@ -167,6 +168,7 @@ namespace DotnetTestingWebApp.Controllers
             });
         }
 
+        [HasPermission("DeleteProduct")]
         [HttpPost]
         public IActionResult GetDataDeleted()
         {
@@ -196,6 +198,32 @@ namespace DotnetTestingWebApp.Controllers
                 // QueryString = sqlnya,
                 Data = data,
             });
+        }
+
+        [HasPermission("ViewProduct")]
+        [HttpGet("export/excel")]
+        public IActionResult ExportExcel()
+        {
+            // var stream = await _service.ExportExcelAsync();
+            var fileName = $"Data-Product-{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx";
+
+            var downloadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "exports");
+            if (!Directory.Exists(downloadFolder))
+            {
+                Directory.CreateDirectory(downloadFolder);
+            }
+
+            var outputPath = Path.Combine(downloadFolder, fileName);
+
+            // Enqueue job
+            _jobs.Enqueue(() => _service.ExportExcelJob(outputPath));
+
+
+            TempData["TypeMessage"] = "success";
+            TempData["ValueMessage"] = $"Proses Export Data Di Background, Lokasi File Di sini : {outputPath}";
+
+            return RedirectToAction(nameof(Index));
+
         }
     }
 }

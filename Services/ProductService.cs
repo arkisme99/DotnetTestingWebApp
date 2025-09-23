@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
 using Microsoft.EntityFrameworkCore;
@@ -110,6 +111,47 @@ namespace DotnetTestingWebApp.Services
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+
+        public async Task<MemoryStream> ExportExcelAsync()
+        {
+            var memoryStream = new MemoryStream();
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Products");
+            worksheet.Cell(1, 1).Value = "Id";
+            worksheet.Cell(1, 2).Value = "Name";
+            worksheet.Cell(1, 3).Value = "Price";
+            worksheet.Cell(1, 4).Value = "Created At";
+            worksheet.Cell(1, 5).Value = "Updated At";
+            worksheet.Cell(1, 6).Value = "Is Deleted";
+            worksheet.Cell(1, 7).Value = "Deleted At";
+
+            var products = await GetProductsAsync();
+            int row = 2;
+            foreach (var product in products)
+            {
+                worksheet.Cell(row, 1).Value = product.Id.ToString();
+                worksheet.Cell(row, 2).Value = product.Name;
+                worksheet.Cell(row, 3).Value = product.Price;
+                worksheet.Cell(row, 4).Value = product.CreatedAt;
+                worksheet.Cell(row, 5).Value = product.UpdatedAt;
+                worksheet.Cell(row, 6).Value = product.IsDeleted;
+                worksheet.Cell(row, 7).Value = product.DeletedAt;
+                row++;
+            }
+
+            workbook.SaveAs(memoryStream);
+            memoryStream.Position = 0;
+            return memoryStream;
+        }
+
+        // Export Excel
+        public async Task ExportExcelJob(string outputPath)
+        {
+            var stream = await ExportExcelAsync();
+            using var fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+            await stream.CopyToAsync(fileStream);
+            Console.WriteLine("Excel Exported via Hangfire Job!");
         }
     }
 }

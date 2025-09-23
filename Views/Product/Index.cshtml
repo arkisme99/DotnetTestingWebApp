@@ -20,7 +20,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <card-layout title="Daftar Produk" button-create-link="Product/Create" button-recycle-link="Product/Recycle" button-multiple-delete="true">
+                <card-layout title="Daftar Produk" button-export-excel="export/excel" button-create-link="Product/Create" button-recycle-link="Product/Recycle" button-multiple-delete="true">
                     @await Html.PartialAsync("Components/_TableOuter", new HtmlString(@"
                         <thead>
                             <tr>
