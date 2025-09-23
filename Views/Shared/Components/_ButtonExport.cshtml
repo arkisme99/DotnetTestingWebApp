@@ -8,5 +8,5 @@
 @if (User.HasClaim("Permission", permissionName))
 {
     <a asp-area="" asp-controller="@ViewData["LinkController"]" asp-action="@ViewData["LinkAction"]"
-        class="btn btn-sm bg-gradient-primary"><i class="fas fa-file-excel"></i> @Localizer["ExportExcel"]</a>
+        class="btn btn-sm bg-gradient-secondary"><i class="fas fa-file-excel"></i> @Localizer["ExportExcel"]</a>
 }

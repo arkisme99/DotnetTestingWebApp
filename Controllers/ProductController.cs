@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Helpers;
@@ -207,7 +208,8 @@ namespace DotnetTestingWebApp.Controllers
             // var stream = await _service.ExportExcelAsync();
             var fileName = $"Data-Product-{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx";
             // Enqueue job
-            _jobs.Enqueue(() => _service.ExportExcelJob(fileName));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
+            _jobs.Enqueue(() => _service.ExportExcelJob(userId, fileName));
 
             TempData["TypeMessage"] = "success";
             TempData["ValueMessage"] = $"Proses Export Data Di Background, link download akan tampil di notifikasi";

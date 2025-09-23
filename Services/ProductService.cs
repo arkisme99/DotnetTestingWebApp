@@ -2,17 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Hubs;
 using DotnetTestingWebApp.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
 {
-    public class ProductService(ApplicationDbContext context, IHubContext<NotificationHub> _hub) : IProductService
+    public class ProductService(ApplicationDbContext context, INotificationService _notification) : IProductService
     {
         private readonly ApplicationDbContext _context = context;
 
@@ -148,7 +150,7 @@ namespace DotnetTestingWebApp.Services
         }
 
         // Export Excel
-        public async Task ExportExcelJob(string fileName)
+        public async Task ExportExcelJob(string userId, string fileName)
         {
             var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "exports");
             if (!Directory.Exists(folder))
@@ -161,13 +163,8 @@ namespace DotnetTestingWebApp.Services
 
             // Kirim notifikasi ke semua user
             var fileUrl = $"/exports/{fileName}";
-            await _hub.Clients.All.SendAsync("ReceiveNotification", new
-            {
-                Message = "Export Product selesai, klik untuk download",
-                FileUrl = fileUrl,
-                Icon = "fas fa-file-excel",
-                Time = DateTime.Now.ToString("HH:mm")
-            });
+            // simpan notifikasi ke DB + kirim real-time hanya ke user terkait
+            await _notification.AddNotificationAsync(userId, "Proses export produk selesai", fileUrl, "fas fa-file-excel");
         }
     }
 }

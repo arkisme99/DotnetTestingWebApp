@@ -18,6 +18,6 @@ namespace DotnetTestingWebApp.Services
         Task<int> DeleteProductsAsync(string ids);
         Task RestoreAsync(Guid id);
         Task<MemoryStream> ExportExcelAsync();
-        Task ExportExcelJob(string fileName);
+        Task ExportExcelJob(string userId, string fileName);
     }
 }

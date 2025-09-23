@@ -23,6 +23,8 @@ namespace DotnetTestingWebApp.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ApplicationRolePermission> RolePermissions { get; set; }
         public DbSet<ActivityLog> ActivityLogs { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
 
         /* public override int SaveChanges()
         {

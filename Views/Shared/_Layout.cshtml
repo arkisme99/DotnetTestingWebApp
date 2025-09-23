@@ -99,6 +99,8 @@
                 }
                 updateDarkModeIcon(); // Perbarui ikon setelah toggle
             });
+
+            loadUnreadNotifications();
         });
     </script>
     <script>
@@ -117,23 +119,101 @@
 
         connection.on("ReceiveNotification", function (data) {
             @* console.log(`Data Notif ${JSON.stringify(data)}`); *@
-                let count = parseInt($(".notification-count").text() || "0", 10);
-            $(".notification-count").text(count + 1);
+                let count = parseInt($("#notifCountNavbar").text() || "0", 10);
+            @* console.log(`Notif: ${count}`); *@
+                $("#notifCountNavbar").text(count + 1);
 
             let list = document.getElementById("notification-list");
 
-            let itemData = `<a href="${data.fileUrl}" class="dropdown-item text-wrap">
+            @* let itemData = `<a href="${data.fileUrl}" class="dropdown-item text-wrap">
                 <i class="${data.icon} mr-2"></i> ${data.message}
                 <span class="float-right text-muted text-sm">${data.time}</span>
-            </a>`;
+            </a><div class="dropdown-divider"></div>`; *@
 
-            $("#notification-list").append(itemData)
-            @*  let li = document.createElement("li");
-            li.innerHTML = `${data.Message} - <a href="${data.FileUrl}" download>Download</a>`;
-            list.prepend(li); *@
+            if (data.fileUrl) {
+                linkDownload = `<a href="${data.fileUrl || '#'}" class="nav-link text-success">Download</a>`;
+            }
+            let itemData = `<span class="dropdown-item d-flex align-items-start text-wrap" data-id="0">
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="font-weight-normal">
+                                ${data.message}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted d-block">${linkDownload}</small>
+                            <small class="text-muted d-block text-right">${data.time}</small>
+                        </div
+                    </div>
+                </span><div class="dropdown-divider"></div>`;
+
+            $("#notification-list").prepend(itemData)
         });
 
-        connection.start();
+        connection.start()
+            .then(function () {
+                console.log("SignalR Connected!");
+            })
+            .catch(function (err) {
+                return console.error(err.toString());
+            });
+
+        function deleteNotification(id) {
+            // API untuk mark as read
+            let dtURL = "@Url.Action("read", "Notification")";
+            fetch(dtURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "id=" + encodeURIComponent(id)
+            })
+                .then(res => {
+                    if (res.ok) {
+                        console.log("Notification marked as read");
+                    }
+                });
+        }
+
+        function loadUnreadNotifications() {
+            let dtURL = "@Url.Action("unread", "Notification")";
+            fetch(dtURL)
+                .then(res => res.json())
+                .then(data => {
+                    $("#notification-list").empty();
+
+                    if (data.length === 0) {
+                        $("#notification-list").append(
+                            `<span class="dropdown-item text-muted">No new notifications</span>`
+                        );
+                    }
+
+                    data.forEach(n => {
+                        let linkDownload = '';
+
+                        if (n.fileUrl) {
+                            linkDownload = `<a href="${n.fileUrl || '#'}" class="nav-link text-success">Download</a>`;
+                        }
+                        let itemData = `<span class="dropdown-item d-flex align-items-start text-wrap" data-id="${n.id}">
+                                <div class="w-100">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="font-weight-normal">
+                                            ${n.message}
+                                        </div>
+                                        <a href="javascript:;" onclick="deleteNotification(${n.id})" class="nav-link text-sm text-danger"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted d-block">${linkDownload}</small>
+                                        <small class="text-muted d-block text-right">${n.time}</small>
+                                    </div
+                                </div>
+                            </span><div class="dropdown-divider"></div>`;
+                        $("#notification-list").append(itemData);
+                    });
+
+                    $(".notification-count").text(data.length);
+                });
+        }
     </script>
 
 </body>

@@ -91,6 +91,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IActivityLogService, ActivityLogService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Routing lowercase
 builder.Services.AddRouting(options =>
