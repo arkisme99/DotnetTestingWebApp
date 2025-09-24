@@ -17,6 +17,7 @@ namespace DotnetTestingWebApp.TagHelpers
         public string? ButtonRecycleLink { get; set; }
         public string? ButtonExportExcel { get; set; }
         public Boolean ButtonMultipleDelete { get; set; } = false;
+        public Boolean ButtonImportExcel { get; set; } = false;
         private readonly IHtmlHelper _htmlHelper = htmlHelper;
 
         [ViewContext] // supaya HtmlHelper tahu konteks View
@@ -34,11 +35,19 @@ namespace DotnetTestingWebApp.TagHelpers
 
             var buttonMultiDelete = await _htmlHelper.PartialAsync("Components/_ButtonMultiDelete");
 
+
             output.Content.AppendHtml("<div class='card-header'>");
             output.Content.AppendHtml($"<h3 class='card-title'>{Title}</h3>");
             output.Content.AppendHtml("<div class='card-tools'>");
 
             //component button recycle
+            if (ButtonImportExcel == true)
+            {
+                var buttonImportExcel = await _htmlHelper.PartialAsync("Components/_ButtonImportExcel");
+                output.Content.AppendHtml(buttonImportExcel);
+                output.Content.AppendHtml(" ");
+            }
+
             if (!string.IsNullOrEmpty(ButtonExportExcel))
             {
                 var parts = ButtonExportExcel.Split('/');

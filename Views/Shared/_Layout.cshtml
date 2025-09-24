@@ -122,17 +122,15 @@
                 let count = parseInt($("#notifCountNavbar").text() || "0", 10);
             @* console.log(`Notif: ${count}`); *@
                 $("#notifCountNavbar").text(count + 1);
+            $(".notification-count").text(count + 1);
 
-            let list = document.getElementById("notification-list");
 
-            @* let itemData = `<a href="${data.fileUrl}" class="dropdown-item text-wrap">
-                <i class="${data.icon} mr-2"></i> ${data.message}
-                <span class="float-right text-muted text-sm">${data.time}</span>
-            </a><div class="dropdown-divider"></div>`; *@
+            let linkDownload = "";
 
             if (data.fileUrl) {
                 linkDownload = `<a href="${data.fileUrl || '#'}" class="nav-link text-success">Download</a>`;
             }
+
             let itemData = `<span class="dropdown-item d-flex align-items-start text-wrap" data-id="0">
                     <div class="w-100">
                         <div class="d-flex justify-content-between align-items-center">
@@ -147,7 +145,11 @@
                     </div>
                 </span><div class="dropdown-divider"></div>`;
 
+            if (count <= 1) {
+                $("#notification-list").append(itemData)
+            }
             $("#notification-list").prepend(itemData)
+
         });
 
         connection.start()
@@ -181,13 +183,6 @@
                 .then(res => res.json())
                 .then(data => {
                     $("#notification-list").empty();
-
-                    if (data.length === 0) {
-                        $("#notification-list").append(
-                            `<span class="dropdown-item text-muted">No new notifications</span>`
-                        );
-                    }
-
                     data.forEach(n => {
                         let linkDownload = '';
 

@@ -1,0 +1,21 @@
+<div class="modal fade" id="modal-import">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Import Data</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="@ViewData["FormAction"]" id="formImport" method="post" class="frm-import" enctype="multipart/form-data">
+                <div class="modal-body">
+                    @await Html.PartialAsync("Components/_FormInput", new ViewDataDictionary(ViewData) { { "Label", "Upload File Excel" }, { "Name", "file" }, { "Attributes", "type=\"file\" accept=\".xls,.xlsx\" required" } })
+                </div>
+                <div class="modal-footer">
+                    @await Html.PartialAsync("Components/_ButtonCancel")
+                    @await Html.PartialAsync("Components/_SubmitSave")
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

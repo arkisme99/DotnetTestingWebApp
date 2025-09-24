@@ -20,7 +20,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <card-layout title="Daftar Produk" button-export-excel="export/excel" button-create-link="Product/Create" button-recycle-link="Product/Recycle" button-multiple-delete="true">
+                <card-layout title="Daftar Produk" button-import-excel="true" button-export-excel="export/excel" button-create-link="Product/Create" button-recycle-link="Product/Recycle" button-multiple-delete="true">
                     @await Html.PartialAsync("Components/_TableOuter", new HtmlString(@"
                         <thead>
                             <tr>
@@ -49,6 +49,8 @@
     </div>
 </div>
 
+@await Html.PartialAsync("Components/_ModalImport", new ViewDataDictionary(ViewData) { {"FormAction", "Import"} })
+
 @await Html.PartialAsync("Components/_ModalDelete", new HtmlString(@"<p>Anda yakin ingin hapus data ?</p>
 		<p id='content'></p>"), new ViewDataDictionary(ViewData) { { "ModalId", "modal-delete" }, { "FormId", "formHapus" } })
 
@@ -64,6 +66,7 @@
 <script src="~/helpers/js/format-date.js"></script>
 <script src="~/helpers/js/format-rupiah.js"></script>
 <script src="~/helpers/js/multi-delete.js"></script>
+<script src="~/helpers/js/import-excel.js"></script>
 <script type="text/template" id="tpl-button-dropdown">
     @await Html.PartialAsync("Components/_ButtonDropdown", new HtmlString(@"<div class='dropdown-menu' style=''>__BTN__</div>"))
 </script>
@@ -170,11 +173,16 @@
         let multiDeleteDataUrl = `/product/multi-delete`;
         hapusmulti(multiDeleteDataUrl);
     });
+    
 
     $("#formHapusMulti").submit(function (e) {
         let tpl = $("#tpl-loading-icon").html();
         $(".delete").html(tpl);
         $(".delete").prop("disabled", true);
+    });
+    
+    $("#btn-import").on("click", function () {
+        importexcel()
     });
 </script>
 }

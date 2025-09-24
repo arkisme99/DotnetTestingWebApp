@@ -19,5 +19,6 @@ namespace DotnetTestingWebApp.Services
         Task RestoreAsync(Guid id);
         Task<MemoryStream> ExportExcelAsync();
         Task ExportExcelJob(string userId, string fileName);
+        Task ImportExcelAsync(string userId, string filePath);
     }
 }

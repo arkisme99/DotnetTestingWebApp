@@ -166,5 +166,37 @@ namespace DotnetTestingWebApp.Services
             // simpan notifikasi ke DB + kirim real-time hanya ke user terkait
             await _notification.AddNotificationAsync(userId, "Proses export produk selesai", fileUrl, "fas fa-file-excel");
         }
+
+        //Import Excel
+        public async Task ImportExcelAsync(string userId, string filePath)
+        {
+            int count = 0;
+
+            using var workbook = new XLWorkbook(filePath);
+            var worksheet = workbook.Worksheet(1);
+            var rows = worksheet.RowsUsed().Skip(1); // skip header
+
+            foreach (var row in rows)
+            {
+                var product = new Product
+                {
+                    Name = row.Cell(1).GetValue<string>(),
+                    Price = row.Cell(2).GetValue<decimal>()
+                };
+
+                _context.Products.Add(product);
+                count++;
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Kirim notifikasi ke user
+            await _notification.AddNotificationAsync(
+                userId,
+                $"Proses import produk selesai, total {count} data",
+                "",
+                "fas fa-info-circle"
+            );
+        }
     }
 }

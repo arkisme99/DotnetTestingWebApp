@@ -201,7 +201,7 @@ namespace DotnetTestingWebApp.Controllers
             });
         }
 
-        [HasPermission("ViewProduct")]
+        [HasPermission("CreateProduct")]
         [HttpGet("export/excel")]
         public IActionResult ExportExcel()
         {
@@ -216,6 +216,31 @@ namespace DotnetTestingWebApp.Controllers
 
             return RedirectToAction(nameof(Index));
 
+        }
+
+        [HasPermission("CreateProduct")]
+        [HttpPost, ActionName("Import")]
+        public async Task<IActionResult> ImportExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("File kosong");
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "system";
+
+            // Simpan sementara di disk
+            var tempPath = Path.Combine(Path.GetTempPath(), file.FileName);
+            using (var stream = new FileStream(tempPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Enqueue job Hangfire
+            _jobs.Enqueue(() => _service.ImportExcelAsync(userId, tempPath));
+
+            TempData["TypeMessage"] = "success";
+            TempData["ValueMessage"] = $"Proses Import Data Di Background, saat selesai akan tampil notifikasi";
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

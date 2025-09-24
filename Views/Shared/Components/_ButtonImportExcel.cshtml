@@ -1,0 +1,13 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var permissionName = $"Create{controllerName}";
+}
+@if (User.HasClaim("Permission", permissionName))
+{
+    <a href='javascript:;' class='btn btn-sm bg-gradient-secondary' id="btn-import"><i class='fas fa-file-import'></i>
+        @Localizer["ImportExcel"]</a>
+}
