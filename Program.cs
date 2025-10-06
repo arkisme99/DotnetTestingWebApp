@@ -205,6 +205,7 @@ app.MapHub<NotificationHub>("/hubs/notification");
 // 🔹 Custom Middleware: redirect kalau sudah login akses /Login
 app.Use(async (context, next) =>
 {
+    // CEK LOGIN HOST
     if (context.User?.Identity?.IsAuthenticated == true)
     {
         if (context.Request.Path.StartsWithSegments("/auth/login") ||
@@ -217,6 +218,7 @@ app.Use(async (context, next) =>
     }
 
     await next();
+
 });
 
 app.UseAuthorization();

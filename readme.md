@@ -37,3 +37,12 @@ dotnet ef database update
 ```
 dotnet ef migrations add Initial --ignore-changes
 ```
+
+##Migration Host & Tenant
+dotnet ef migrations add InitTenantStore -c MultiTenantStoreDbContext
+dotnet ef database drop --context MultiTenantStoreDbContext (HOST)
+dotnet ef database update -c MultiTenantStoreDbContext
+
+dotnet ef migrations add InitTenantDb -c ApplicationDbContext
+dotnet ef database drop --context ApplicationDbContext
+dotnet ef database update -c ApplicationDbContext
