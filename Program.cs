@@ -6,6 +6,8 @@ using DotnetTestingWebApp.Hubs;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Seeders;
 using DotnetTestingWebApp.Services;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
 using Hangfire;
 using Hangfire.MySql;
 using Microsoft.AspNetCore.Authorization;
@@ -16,15 +18,39 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ---------- Koneksi ke database Host (tempat simpan data tenant) ----------
+builder.Services.AddDbContext<MultiTenantStoreDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 36))
+    ));
+
+builder.Services.AddMultiTenant<AppTenantInfo>()
+    .WithEFCoreStore<MultiTenantStoreDbContext, AppTenantInfo>()
+    .WithRouteStrategy();
+
+// ========== Application DB (per-tenant) ==========
+builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+{
+    var tenantAccessor = sp.GetRequiredService<IMultiTenantContextAccessor<AppTenantInfo>>();
+    var tenantInfo = tenantAccessor?.MultiTenantContext?.TenantInfo;
+
+    string? connectionString = tenantInfo?.ConnectionString
+        ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 36)));
+});
+
+
 //Service DbContext
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+/* builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
     // options.AddInterceptors(new ActivityLogInterceptor(new HttpContextAccessor()));
-});
+}); */
 
 // 🔹 Tambahkan Hangfire + MySQL Storage
 builder.Services.AddHangfire(config =>
@@ -143,6 +169,8 @@ var app = builder.Build();
 // Gunakan cookie untuk simpan pilihan bahasa
 /* localizationOptions.RequestCultureProviders.Insert(1, new QueryStringRequestCultureProvider());
 localizationOptions.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider()); */
+
+app.UseMultiTenant();
 
 // 🔹 panggil seeder di sini
 using (var scope = app.Services.CreateScope())
