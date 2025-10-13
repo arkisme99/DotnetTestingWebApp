@@ -2,6 +2,7 @@ using System.Diagnostics;
 using DotnetTestingWebApp.Extensions;
 using DotnetTestingWebApp.Hubs;
 using DotnetTestingWebApp.Seeders;
+using DotnetTestingWebApp.Services;
 using Finbuckle.MultiTenant;
 using Hangfire;
 using Microsoft.Extensions.Options;
@@ -38,6 +39,10 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await TenantSeeder.SeedAsync(services);
+
+    var tenantMigrator = services.GetRequiredService<TenantMigrationRunner>();
+    await tenantMigrator.MigrateAllTenantsAsync();
+
     await IdentitySeeder.SeedAsync(services);
 }
 

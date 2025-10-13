@@ -17,6 +17,7 @@ namespace DotnetTestingWebApp.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IActivityLogService, ActivityLogService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<TenantMigrationRunner>();
 
             return services;
         }
