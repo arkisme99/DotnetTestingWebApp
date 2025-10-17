@@ -42,7 +42,11 @@ using (var scope = app.Services.CreateScope())
     // 1️⃣ Jalankan migrasi untuk HOST
     await HostMigrationRunner.RunAsync(services);
 
+    // Jalankan contoh tenant seeder
     await TenantSeeder.SeedAsync(services);
+
+    // Jalankan identity seeder untuk HOST
+    await IdentitySeeder.SeedAsync(services);
 
     // 2️⃣ Jalankan migrasi untuk TENANT
     var tenantMigrator = services.GetRequiredService<TenantMigrationRunner>();
@@ -50,9 +54,6 @@ using (var scope = app.Services.CreateScope())
     await Task.Delay(2000); //delay sebentar agar aman migration tenantnya, 2 detik cukup
 
     await tenantMigrator.MigrateAllTenantsAsync();
-
-    // 3️⃣ Jalankan seeder untuk semua
-    await IdentitySeeder.SeedAsync(services);
 }
 
 // Configure the HTTP request pipeline.

@@ -25,14 +25,14 @@ namespace DotnetTestingWebApp.Seeders
                     Id = Guid.NewGuid().ToString(),
                     Identifier = "tenant1",
                     Name = "Tenant Satu",
-                    ConnectionString = "server=localhost;port=3306;database=tenant1_db;user=root;password=;"
+                    ConnectionString = "server=localhost;port=3309;database=tenant1_db;user=root;password=12345;"
                 },
                 new()
                 {
                     Id = Guid.NewGuid().ToString(),
                     Identifier = "tenant2",
                     Name = "Tenant Dua",
-                    ConnectionString = "server=localhost;port=3306;database=tenant2_db;user=root;password=;"
+                    ConnectionString = "server=localhost;port=3309;database=tenant2_db;user=root;password=12345;"
                 }
             };
 

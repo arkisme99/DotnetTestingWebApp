@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DotnetTestingWebApp.Data;
 using DotnetTestingWebApp.Models;
+using DotnetTestingWebApp.Seeders;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
@@ -33,18 +34,15 @@ namespace DotnetTestingWebApp.Services
                     var httpContextAccessor = _serviceProvider.GetRequiredService<IHttpContextAccessor>();
                     using var db = new ApplicationDbContext(optionsBuilder.Options, httpContextAccessor);
 
-                    // Pastikan database ada
-                    if (!await db.Database.CanConnectAsync())
-                    {
-                        Console.WriteLine($"Database for {tenant.Identifier} not found. Creating...");
-                        await db.Database.EnsureCreatedAsync();
-                    }
-
-
-                    await db.Database.EnsureCreatedAsync();
+                    var canConnect = await db.Database.CanConnectAsync();
                     await db.Database.MigrateAsync();
 
-                    Console.WriteLine($"✅ Migration complete for {tenant.Name}");
+                    Console.WriteLine(canConnect
+                        ? $"✅ Migrated existing database for {tenant.Name}"
+                        : $"✅ Created and migrated new database for {tenant.Name}");
+
+                    // Jalankan seeder tenant
+                    await TenantIdentitySeeder.SeedAsync(_serviceProvider, tenant.ConnectionString ?? "", tenant.Identifier ?? "tenant");
                 }
                 catch (Exception ex)
                 {
