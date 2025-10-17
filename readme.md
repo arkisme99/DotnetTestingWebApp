@@ -1,4 +1,4 @@
-#Apa yang ada di dalam ?
+#Fitur-fitur
 
 - Pattern MVC + Service
 - Components Views
@@ -20,31 +20,12 @@
 ```
 dotnet user-secrets init
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "server=localhost;port=3306;database=database_name;user=root;password="
-
-dotnet ef migrations add InitialCreate
-dotnet ef database update
 ```
 
-#reset migration
+#command migrations
 
-- Hapus folder migrations
-- dotnet ef database drop
 - dotnet ef migrations add Initial
 - dotnet ef database update
-
-#reset migration tanpa drop database
-
-```
-dotnet ef migrations add Initial --ignore-changes
-```
+- dotnet ef database drop
 
 ##Migration Host & Tenant
-
-<!-- Host -->
-
-dotnet ef migrations add InitialHost --context MultiTenantStoreDbContext
-dotnet ef database update --context MultiTenantStoreDbContext
-
-<!-- Tenant -->
-
-dotnet ef migrations add InitialTenant --context ApplicationDbContext
