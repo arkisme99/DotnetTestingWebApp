@@ -32,8 +32,8 @@ namespace DotnetTestingWebApp.Seeders
             }
 
             //
-            var userStore = new UserStore<ApplicationUser>(dbContext);
-            var roleStore = new RoleStore<ApplicationRole>(dbContext);
+            var userStore = new UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, string>(dbContext);
+            var roleStore = new RoleStore<ApplicationRole, ApplicationDbContext, string>(dbContext);
 
             var userManager = ActivatorUtilities.CreateInstance<UserManager<ApplicationUser>>(serviceProvider, userStore);
             var roleManager = ActivatorUtilities.CreateInstance<RoleManager<ApplicationRole>>(serviceProvider, roleStore);
