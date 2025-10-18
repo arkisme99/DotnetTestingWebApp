@@ -9,6 +9,7 @@ using DotnetTestingWebApp.Authorization;
 using DotnetTestingWebApp.Helpers;
 using DotnetTestingWebApp.Models;
 using DotnetTestingWebApp.Services;
+using Finbuckle.MultiTenant.Abstractions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ using Microsoft.Extensions.Localization;
 namespace DotnetTestingWebApp.Controllers
 {
     [Authorize]
-    public class ProductController(IProductService _service, IStringLocalizer<SharedResource> localizer, IBackgroundJobClient _jobs) : Controller
+    public class ProductController(IProductService _service, IStringLocalizer<SharedResource> localizer, IBackgroundJobClient _jobs, ITenantInfo _tenantInfo) : Controller
     {
 
         [HasPermission("ViewProduct")]
@@ -207,9 +208,11 @@ namespace DotnetTestingWebApp.Controllers
         {
             // var stream = await _service.ExportExcelAsync();
             var fileName = $"Data-Product-{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx";
+
             // Enqueue job
+            var tenantId = _tenantInfo?.Id ?? "host"; // ambil tenant saat ini
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "System";
-            _jobs.Enqueue(() => _service.ExportExcelJob(userId, fileName));
+            _jobs.Enqueue(() => _service.ExportExcelJob(userId, fileName, tenantId));
 
             TempData["TypeMessage"] = "success";
             TempData["ValueMessage"] = $"Proses Export Data Di Background, link download akan tampil di notifikasi";

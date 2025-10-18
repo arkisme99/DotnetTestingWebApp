@@ -6,10 +6,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using DotnetTestingWebApp.Data;
-using DotnetTestingWebApp.Hubs;
 using DotnetTestingWebApp.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotnetTestingWebApp.Services
@@ -150,8 +147,9 @@ namespace DotnetTestingWebApp.Services
         }
 
         // Export Excel
-        public async Task ExportExcelJob(string userId, string fileName)
+        public async Task ExportExcelJob(string userId, string fileName, string tenantId)
         {
+
             var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "exports");
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
@@ -165,6 +163,7 @@ namespace DotnetTestingWebApp.Services
             var fileUrl = $"/exports/{fileName}";
             // simpan notifikasi ke DB + kirim real-time hanya ke user terkait
             await _notification.AddNotificationAsync(userId, "Proses export produk selesai", fileUrl, "fas fa-file-excel");
+
         }
 
         //Import Excel
